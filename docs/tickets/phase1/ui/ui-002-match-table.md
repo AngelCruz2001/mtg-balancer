@@ -1,17 +1,17 @@
 ---
 id: ui-002
-title: 'Match table view — player positions and card display'
-status: ready
+title: Match table view — player positions and card display
+status: in_progress
 phase: 1
 area: ui
-created: 2026-05-06
+created: 2026-05-06T00:00:00.000Z
 complexity: high
 agent: gemini
 implementer: gemini
 tags:
-  - status/ready
   - phase/1
   - area/ui
+  - status/in_progress
 files:
   - src/app/match/page.tsx
   - src/components/table/MatchTable.tsx
@@ -20,8 +20,8 @@ files:
 depends_on:
   - ui-001
 related:
-  - "[[ui-001-deck-loader]]"
-  - "[[data-001-deck-store]]"
+  - '[[ui-001-deck-loader]]'
+  - '[[data-001-deck-store]]'
 ---
 
 # ui-002 — Match table view — player positions and card display
