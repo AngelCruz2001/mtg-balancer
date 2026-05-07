@@ -1,11 +1,7 @@
 ---
 id: ui-001
 title: Deck loader — player seat setup and decklist import
-<<<<<<< HEAD
-status: ready
-=======
-status: in_progress
->>>>>>> ui-001-impl
+status: blocked
 phase: 1
 area: ui
 created: 2026-05-06T00:00:00.000Z
@@ -15,11 +11,7 @@ implementer: gemini
 tags:
   - phase/1
   - area/ui
-<<<<<<< HEAD
-  - status/ready
-=======
-  - status/in_progress
->>>>>>> ui-001-impl
+  - status/blocked
 files:
   - src/app/page.tsx
   - src/components/deck-loader/DeckLoaderPanel.tsx
@@ -214,4 +206,18 @@ graph LR
   ui-001 --> F0["src/app/page.tsx"]
   ui-001 --> F1["src/components/deck-loader/DeckLoaderPanel.tsx"]
   ui-001 --> F2["src/components/deck-loader/PlayerSlot.tsx"]
+```
+
+
+## Log
+
+> [!danger] Blocked 2026-05-07 — failed 2/2 attempts
+> **Error:** Auto-stash restore failed after finalize merge.
+> **Next step:** Human review required
+
+```
+Auto-stash restore failed after finalize merge.
+git stash apply stash@{0}
+error: could not write index
+The stash was kept as stash@{0}. Resolve the conflicts manually before re-running orchestrator.
 ```

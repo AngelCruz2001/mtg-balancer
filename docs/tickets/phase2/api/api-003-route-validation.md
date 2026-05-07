@@ -19,11 +19,7 @@ depends_on:
   - data-001
   - api-002
 related:
-<<<<<<< HEAD
-  - '[[api-001-analysis-module]]'
-=======
   - '[[api-002-analysis-module]]'
->>>>>>> ui-001-impl
   - '[[data-001-analysis-report-type]]'
 ---
 
