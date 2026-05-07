@@ -1,23 +1,23 @@
 ---
 id: ui-001
-title: 'Show failed card names in deck loader UI'
-status: ready
+title: Show failed card names in deck loader UI
+status: in_progress
 phase: 2
 area: ui
-created: 2026-05-06
+created: 2026-05-06T00:00:00.000Z
 complexity: low
 agent: gemini
 implementer: gemini
 tags:
-  - status/ready
   - phase/2
   - area/ui
+  - status/in_progress
 files:
   - src/components/deck-loader/PlayerSlot.tsx
 depends_on:
   - data-002
 related:
-  - "[[data-002-deck-parse-errors]]"
+  - '[[data-002-deck-parse-errors]]'
 ---
 
 # ui-001 — Show failed card names in deck loader UI
@@ -94,3 +94,9 @@ The `err.reason` message is intentionally not shown in the UI — it is a raw Sc
 - [ ] The warning block lists the exact original line text (e.g. `1 Lighnting Boltt`), not a generic message
 - [ ] The valid cards in the same deck still load and display correctly
 - [ ] Warning block disappears when the user re-loads the deck with corrected card names
+
+
+## Log
+
+> [!warning] Retry 2026-05-07 — attempt 1 failed, retrying with error context
+> **Error fed back:** [build]
