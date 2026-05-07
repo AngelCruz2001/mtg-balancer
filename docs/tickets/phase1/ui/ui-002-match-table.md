@@ -1,7 +1,7 @@
 ---
 id: ui-002
 title: Match table view — player positions and card display
-status: in_progress
+status: done
 phase: 1
 area: ui
 created: 2026-05-06T00:00:00.000Z
@@ -11,7 +11,7 @@ implementer: gemini
 tags:
   - phase/1
   - area/ui
-  - status/in_progress
+  - status/done
 files:
   - src/app/match/page.tsx
   - src/components/table/MatchTable.tsx
@@ -206,3 +206,19 @@ images: { domains: ['cards.scryfall.io'] }
 - [ ] Mana curve bars are visible per player zone
 - [ ] Page has a green felt-like background gradient
 - [ ] "Back to Setup" link returns to `/`
+
+
+## Log
+
+> [!success] Completed 2026-05-07 — attempt 1/2
+> **Commit:** `25862ae`
+> **Files written:** [[src/app/match/page.tsx]] · [[src/components/table/MatchTable.tsx]] · [[src/components/table/PlayerZone.tsx]] · [[src/components/table/CardGrid.tsx]]
+
+```mermaid
+graph LR
+  ui-002["ui-002"]
+  ui-002 --> F0["src/app/match/page.tsx"]
+  ui-002 --> F1["src/components/table/MatchTable.tsx"]
+  ui-002 --> F2["src/components/table/PlayerZone.tsx"]
+  ui-002 --> F3["src/components/table/CardGrid.tsx"]
+```
