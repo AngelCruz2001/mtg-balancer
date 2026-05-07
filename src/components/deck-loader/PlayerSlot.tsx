@@ -6,17 +6,19 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Loader2 } from 'lucide-react'
+import { Loader2, AlertCircle } from 'lucide-react'
 import type { PlayerSeat } from '@/types/deck'
 
 export default function PlayerSlot({ seat }: { seat: PlayerSeat }) {
   const [name, setName] = useState(`Player ${seat}`)
   const [raw, setRaw] = useState('')
+  
   const addPlayer = useAppStore(s => s.addPlayer)
   const loadDeck = useAppStore(s => s.loadDeck)
   const player = useAppStore(s => s.players.find(p => p.seat === seat))
 
   async function handleLoad() {
+    if (!raw.trim()) return
     addPlayer(seat, name)
     await loadDeck(seat, raw)
   }
@@ -24,36 +26,71 @@ export default function PlayerSlot({ seat }: { seat: PlayerSeat }) {
   const totalCards = player?.cards.reduce((sum, dc) => sum + dc.quantity, 0) ?? 0
 
   return (
-    <Card>
+    <Card className="flex flex-col h-full">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          Seat {seat}
-          {totalCards > 0 && <Badge variant="secondary">{totalCards} cards</Badge>}
+        <CardTitle className="flex items-center justify-between">
+          <span className="flex items-center gap-2">
+            Seat {seat}
+            {totalCards > 0 && (
+              <Badge variant="outline" className="bg-primary/10 text-primary">
+                {totalCards} cards
+              </Badge>
+            )}
+          </span>
+          {player?.loading && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-3">
-        <Input
-          placeholder="Player name"
-          value={name}
-          onChange={e => setName(e.target.value)}
-        />
-        <Textarea
-          placeholder={"4 Lightning Bolt\n20 Mountain\n..."}
-          rows={8}
-          value={raw}
-          onChange={e => setRaw(e.target.value)}
-          className="font-mono text-sm"
-        />
+      <CardContent className="space-y-4 flex-grow flex flex-col">
+        <div className="space-y-1.5">
+          <Input
+            placeholder="Player name"
+            value={name}
+            onChange={e => setName(e.target.value)}
+            onBlur={() => name.trim() && addPlayer(seat, name)}
+          />
+        </div>
+        
+        <div className="flex-grow flex flex-col space-y-1.5">
+          <Textarea
+            placeholder={"4 Lightning Bolt\n20 Mountain\n..."}
+            className="flex-grow font-mono text-xs resize-none"
+            rows={8}
+            value={raw}
+            onChange={e => setRaw(e.target.value)}
+          />
+        </div>
+
         {player?.error && (
-          <p className="text-destructive text-sm">{player.error}</p>
+          <div className="p-3 rounded-md bg-destructive/10 text-destructive text-sm flex gap-2">
+            <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
+            <p>{player.error}</p>
+          </div>
         )}
+
+        {player?.parseErrors && player.parseErrors.length > 0 && (
+          <div className="p-3 rounded-md bg-yellow-500/10 border border-yellow-500/20 text-yellow-600 dark:text-yellow-500 text-sm">
+            <p className="font-medium mb-1">Some cards could not be loaded:</p>
+            <ul className="list-disc list-inside text-xs space-y-0.5 opacity-90">
+              {player.parseErrors.map((err, i) => (
+                <li key={i}>{err.line}: {err.reason}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+
         <Button
           className="w-full"
           onClick={handleLoad}
           disabled={!raw.trim() || player?.loading}
         >
-          {player?.loading ? <Loader2 className="animate-spin mr-2 h-4 w-4" /> : null}
-          {player?.loading ? 'Loading…' : 'Load Deck'}
+          {player?.loading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Loading Decks...
+            </>
+          ) : (
+            'Load Deck'
+          )}
         </Button>
       </CardContent>
     </Card>

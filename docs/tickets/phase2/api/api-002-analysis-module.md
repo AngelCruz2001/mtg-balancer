@@ -1,7 +1,7 @@
 ---
-id: api-001
+id: api-002
 title: Extract Anthropic analysis logic into dedicated module
-status: in_progress
+status: blocked
 phase: 2
 area: api
 created: 2026-05-06T00:00:00.000Z
@@ -11,7 +11,7 @@ implementer: gemini
 tags:
   - phase/2
   - area/api
-  - status/in_progress
+  - status/blocked
 files:
   - src/lib/analysis.ts
   - src/app/api/analyze/route.ts
@@ -19,10 +19,10 @@ depends_on:
   - data-001
 related:
   - '[[data-001-analysis-report-type]]'
-  - '[[api-002-route-validation]]'
+  - '[[api-003-route-validation]]'
 ---
 
-# api-001 — Extract Anthropic analysis logic into dedicated module
+# api-002 — Extract Anthropic analysis logic into dedicated module
 
 ## Problem
 

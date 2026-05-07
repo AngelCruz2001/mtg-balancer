@@ -1,7 +1,7 @@
 ---
 id: ui-001
 title: Deck loader — player seat setup and decklist import
-status: done
+status: in_progress
 phase: 1
 area: ui
 created: 2026-05-06T00:00:00.000Z
@@ -11,7 +11,7 @@ implementer: gemini
 tags:
   - phase/1
   - area/ui
-  - status/done
+  - status/in_progress
 files:
   - src/app/page.tsx
   - src/components/deck-loader/DeckLoaderPanel.tsx
