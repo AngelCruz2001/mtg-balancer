@@ -1,5 +1,5 @@
 ---
-id: api-002
+id: api-003
 title: Request and response validation for /api/analyze
 status: blocked
 phase: 2

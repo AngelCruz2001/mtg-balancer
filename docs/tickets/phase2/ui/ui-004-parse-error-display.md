@@ -1,6 +1,5 @@
-
 ---
-id: ui-001
+id: ui-004
 title: Show failed card names in deck loader UI
 status: done
 phase: 2
@@ -12,7 +11,7 @@ implementer: gemini
 tags:
   - phase/2
   - area/ui
-  - status/blocked
+  - status/done
 files:
   - src/components/deck-loader/PlayerSlot.tsx
 depends_on:
@@ -21,7 +20,7 @@ related:
   - '[[data-002-deck-parse-errors]]'
 ---
 
-# ui-001 — Show failed card names in deck loader UI
+# ui-004 — Show failed card names in deck loader UI
 
 ## Problem
 

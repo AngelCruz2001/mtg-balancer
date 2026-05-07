@@ -1,5 +1,5 @@
 ---
-id: infra-001
+id: infra-002
 title: Vitest setup and minimal test coverage for parsing and analysis
 status: done
 phase: 2
@@ -11,7 +11,7 @@ implementer: gemini
 tags:
   - phase/2
   - area/infra
-  - status/blocked
+  - status/done
 files:
   - vitest.config.ts
   - src/lib/analysis.test.ts
