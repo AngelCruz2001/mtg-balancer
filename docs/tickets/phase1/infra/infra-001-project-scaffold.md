@@ -1,7 +1,7 @@
 ---
 id: infra-001
 title: Project scaffold — Next.js + Shadcn + Tailwind + Zustand
-status: blocked
+status: ready
 phase: 1
 area: infra
 created: 2026-05-06T00:00:00.000Z
@@ -11,7 +11,7 @@ implementer: claude
 tags:
   - phase/1
   - area/infra
-  - status/blocked
+  - status/ready
 files:
   - package.json
   - next.config.ts
@@ -121,11 +121,20 @@ npm run dev     # home page renders "MTG Deck Balancer"
 Agent made no file changes.
 ```
 
-> [!danger] Blocked 2026-05-07 — failed 2/2 attempts
-> **Error:** git merge --no-ff --no-edit --autostash infra-001-impl
-> **Next step:** Human review required
+> [!success] Completed 2026-05-07 — attempt 1/2
+> **Commit:** `be78bcc`
+> **Files written:** [[package.json]] · [[next.config.ts]] · [[tailwind.config.ts]] · [[components.json]] · [[src/app/layout.tsx]] · [[src/app/page.tsx]] · [[src/app/globals.css]] · [[src/lib/utils.ts]] · [[src/store/index.ts]]
 
-```
-git merge --no-ff --no-edit --autostash infra-001-impl
-
+```mermaid
+graph LR
+  infra-001["infra-001"]
+  infra-001 --> F0["package.json"]
+  infra-001 --> F1["next.config.ts"]
+  infra-001 --> F2["tailwind.config.ts"]
+  infra-001 --> F3["components.json"]
+  infra-001 --> F4["src/app/layout.tsx"]
+  infra-001 --> F5["src/app/page.tsx"]
+  infra-001 --> F6["src/app/globals.css"]
+  infra-001 --> F7["src/lib/utils.ts"]
+  infra-001 --> F8["src/store/index.ts"]
 ```
