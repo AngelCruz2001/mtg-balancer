@@ -1,9 +1,13 @@
 
 
 ---
-id: api-001
+id: api-002
 title: Extract Anthropic analysis logic into dedicated module
+<<<<<<< HEAD
 status: done
+=======
+status: blocked
+>>>>>>> ui-001-impl
 phase: 2
 area: api
 created: 2026-05-06T00:00:00.000Z
@@ -13,7 +17,11 @@ implementer: gemini
 tags:
   - phase/2
   - area/api
+<<<<<<< HEAD
   - status/done
+=======
+  - status/blocked
+>>>>>>> ui-001-impl
 files:
   - src/lib/analysis.ts
   - src/app/api/analyze/route.ts
@@ -21,10 +29,10 @@ depends_on:
   - data-001
 related:
   - '[[data-001-analysis-report-type]]'
-  - '[[api-002-route-validation]]'
+  - '[[api-003-route-validation]]'
 ---
 
-# api-001 — Extract Anthropic analysis logic into dedicated module
+# api-002 — Extract Anthropic analysis logic into dedicated module
 
 ## Problem
 
@@ -156,6 +164,7 @@ Delete the old `buildPrompt` function and the inline JSON parsing from `route.ts
 
 ## Log
 
+<<<<<<< HEAD
 > [!success] Completed 2026-05-07 — attempt 2/2
 > **Commit:** `c9d4cc7`
 > **Files written:** [[src/lib/analysis.ts]] · [[src/app/api/analyze/route.ts]]
@@ -166,3 +175,7 @@ graph LR
   api-001 --> F0["src/lib/analysis.ts"]
   api-001 --> F1["src/app/api/analyze/route.ts"]
 ```
+=======
+> [!warning] Retry 2026-05-07 — attempt 1 failed, retrying with error context
+> **Error fed back:** [typecheck]
+>>>>>>> ui-001-impl

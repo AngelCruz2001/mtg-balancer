@@ -17,13 +17,17 @@ files:
   - src/lib/analysis.ts
 depends_on:
   - data-001
-  - api-001
+  - api-002
 related:
+<<<<<<< HEAD
   - '[[api-001-analysis-module]]'
+=======
+  - '[[api-002-analysis-module]]'
+>>>>>>> ui-001-impl
   - '[[data-001-analysis-report-type]]'
 ---
 
-# api-002 — Request and response validation for /api/analyze
+# api-003 — Request and response validation for /api/analyze
 
 ## Problem
 
