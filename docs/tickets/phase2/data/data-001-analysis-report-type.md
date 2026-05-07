@@ -1,7 +1,7 @@
 ---
 id: data-001
 title: AnalysisReport shared type and typed store
-status: in_progress
+status: done
 phase: 2
 area: data
 created: 2026-05-06T00:00:00.000Z
