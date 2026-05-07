@@ -1,17 +1,17 @@
 ---
 id: ui-003
-title: 'Balance analyzer — Claude deck comparison and explanation panel'
-status: ready
+title: Balance analyzer — Claude deck comparison and explanation panel
+status: in_progress
 phase: 1
 area: ui
-created: 2026-05-06
+created: 2026-05-06T00:00:00.000Z
 complexity: high
 agent: gemini
 implementer: gemini
 tags:
-  - status/ready
   - phase/1
   - area/ui
+  - status/in_progress
 files:
   - src/app/api/analyze/route.ts
   - src/components/analyzer/AnalyzerPanel.tsx
@@ -21,8 +21,8 @@ depends_on:
   - ui-002
   - data-001
 related:
-  - "[[ui-002-match-table]]"
-  - "[[data-001-deck-store]]"
+  - '[[ui-002-match-table]]'
+  - '[[data-001-deck-store]]'
 ---
 
 # ui-003 — Balance analyzer — Claude deck comparison and explanation panel

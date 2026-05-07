@@ -3,6 +3,7 @@ import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAppStore } from '@/store'
 import MatchTable from '@/components/table/MatchTable'
+import AnalyzerPanel from '@/components/analyzer/AnalyzerPanel'
 
 export default function MatchPage() {
   const players = useAppStore(s => s.players)
@@ -23,8 +24,9 @@ export default function MatchPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-green-900 via-green-800 to-green-900 p-6">
+    <main className="min-h-screen bg-gradient-to-br from-green-900 via-green-800 to-green-900 p-6 space-y-6">
       <MatchTable players={ready} />
+      <AnalyzerPanel />
     </main>
   )
 }
