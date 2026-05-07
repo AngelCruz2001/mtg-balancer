@@ -1,17 +1,17 @@
 ---
 id: ui-001
-title: 'Deck loader — player seat setup and decklist import'
-status: ready
+title: Deck loader — player seat setup and decklist import
+status: in_progress
 phase: 1
 area: ui
-created: 2026-05-06
+created: 2026-05-06T00:00:00.000Z
 complexity: medium
 agent: gemini
 implementer: gemini
 tags:
-  - status/ready
   - phase/1
   - area/ui
+  - status/in_progress
 files:
   - src/app/page.tsx
   - src/components/deck-loader/DeckLoaderPanel.tsx
@@ -20,8 +20,8 @@ depends_on:
   - infra-001
   - data-001
 related:
-  - "[[infra-001-project-scaffold]]"
-  - "[[data-001-deck-store]]"
+  - '[[infra-001-project-scaffold]]'
+  - '[[data-001-deck-store]]'
 ---
 
 # ui-001 — Deck loader — player seat setup and decklist import
