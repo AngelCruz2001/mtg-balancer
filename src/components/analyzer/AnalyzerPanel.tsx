@@ -1,48 +1,37 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useAppStore } from '@/store'
 import { Button } from '@/components/ui/button'
+import type { AnalysisReport } from '@/types/analysis'
 import { Loader2, BarChart2, AlertCircle } from 'lucide-react'
 import BalanceReport from './BalanceReport'
 
 export default function AnalyzerPanel() {
   const players = useAppStore(s => s.players.filter(p => p.cards.length > 0))
   const setBalanceReport = useAppStore(s => s.setBalanceReport)
-  const savedReport = useAppStore(s => s.balanceReport)
-  
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [report, setReport] = useState<null | { scores: any[]; explanation: string }>(null)
-
-  // Hydrate report from store if it exists
-  useEffect(() => {
-    if (savedReport) {
-      try {
-        setReport(JSON.parse(savedReport))
-      } catch (e) {
-        console.error('Failed to parse saved report', e)
-      }
-    }
-  }, [savedReport])
+  const [report, setReport] = useState<AnalysisReport | null>(null)
 
   async function analyze() {
     setLoading(true)
     setError(null)
+
     try {
       const res = await fetch('/api/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ players }),
       })
-      
-      const data = await res.json()
-      
+
+      const data: AnalysisReport = await res.json()
+
       if (!res.ok) {
         throw new Error(data.error || 'Analysis failed')
       }
-      
+
       setReport(data)
-      setBalanceReport(JSON.stringify(data))
+      setBalanceReport(data)
     } catch (e) {
       setError((e as Error).message)
     } finally {

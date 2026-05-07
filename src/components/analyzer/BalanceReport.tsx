@@ -1,17 +1,8 @@
 import ReactMarkdown from 'react-markdown'
-
-interface Score {
-  seat: number
-  name: string
-  score: number
-  summary: string
-}
+import type { AnalysisReport } from '@/types/analysis'
 
 interface ReportProps {
-  report: {
-    scores: Score[]
-    explanation: string
-  }
+  report: AnalysisReport
 }
 
 export default function BalanceReport({ report }: ReportProps) {
