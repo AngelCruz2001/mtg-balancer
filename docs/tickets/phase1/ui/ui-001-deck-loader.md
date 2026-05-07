@@ -1,7 +1,7 @@
 ---
 id: ui-001
 title: Deck loader — player seat setup and decklist import
-status: in_progress
+status: done
 phase: 1
 area: ui
 created: 2026-05-06T00:00:00.000Z
@@ -11,7 +11,7 @@ implementer: gemini
 tags:
   - phase/1
   - area/ui
-  - status/in_progress
+  - status/done
 files:
   - src/app/page.tsx
   - src/components/deck-loader/DeckLoaderPanel.tsx
@@ -192,3 +192,18 @@ npm install lucide-react
 - [ ] "Start Match →" button is disabled until 2+ decks are loaded
 - [ ] Error message appears if a deck fails to load (e.g. all invalid card names)
 - [ ] Each slot is independently functional (loading one deck does not affect others)
+
+
+## Log
+
+> [!success] Completed 2026-05-07 — attempt 1/2
+> **Commit:** `616d650`
+> **Files written:** [[src/app/page.tsx]] · [[src/components/deck-loader/DeckLoaderPanel.tsx]] · [[src/components/deck-loader/PlayerSlot.tsx]]
+
+```mermaid
+graph LR
+  ui-001["ui-001"]
+  ui-001 --> F0["src/app/page.tsx"]
+  ui-001 --> F1["src/components/deck-loader/DeckLoaderPanel.tsx"]
+  ui-001 --> F2["src/components/deck-loader/PlayerSlot.tsx"]
+```
