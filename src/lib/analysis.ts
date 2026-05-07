@@ -27,14 +27,39 @@ Scores are integers 0-100. Higher = stronger deck. Be concise and fair.`
 }
 
 export function parseAnalysisResponse(text: string): AnalysisReport {
-  // Strip markdown code fences if the model wraps JSON in them
   const jsonMatch = text.match(/\{[\s\S]*\}/)
   if (!jsonMatch) {
     throw new Error('No JSON object found in analysis response')
   }
-  const parsed = JSON.parse(jsonMatch[0]) as AnalysisReport
-  if (!Array.isArray(parsed.scores) || typeof parsed.explanation !== 'string') {
-    throw new Error('Analysis response does not match expected AnalysisReport shape')
+
+  let parsed: unknown
+  try {
+    parsed = JSON.parse(jsonMatch[0])
+  } catch {
+    throw new Error('Analysis response contained invalid JSON')
   }
-  return parsed
+
+  if (
+    typeof parsed !== 'object' ||
+    parsed === null ||
+    !Array.isArray((parsed as Record<string, unknown>).scores) ||
+    typeof (parsed as Record<string, unknown>).explanation !== 'string'
+  ) {
+    throw new Error('Analysis response missing required "scores" array or "explanation" string')
+  }
+
+  const report = parsed as AnalysisReport
+
+  for (const score of report.scores) {
+    if (
+      typeof score.seat !== 'number' ||
+      typeof score.name !== 'string' ||
+      typeof score.score !== 'number' ||
+      typeof score.summary !== 'string'
+    ) {
+      throw new Error('Analysis response contains a malformed score entry')
+    }
+  }
+
+  return report
 }

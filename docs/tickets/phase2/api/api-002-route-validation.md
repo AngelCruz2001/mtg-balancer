@@ -1,17 +1,17 @@
 ---
 id: api-002
-title: 'Request and response validation for /api/analyze'
-status: ready
+title: Request and response validation for /api/analyze
+status: in_progress
 phase: 2
 area: api
-created: 2026-05-06
+created: 2026-05-06T00:00:00.000Z
 complexity: medium
 agent: gemini
 implementer: gemini
 tags:
-  - status/ready
   - phase/2
   - area/api
+  - status/in_progress
 files:
   - src/app/api/analyze/route.ts
   - src/lib/analysis.ts
@@ -19,8 +19,8 @@ depends_on:
   - data-001
   - api-001
 related:
-  - "[[api-001-analysis-module]]"
-  - "[[data-001-analysis-report-type]]"
+  - '[[api-001-analysis-module]]'
+  - '[[data-001-analysis-report-type]]'
 ---
 
 # api-002 — Request and response validation for /api/analyze

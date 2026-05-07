@@ -55,6 +55,21 @@ export default function PlayerSlot({ seat }: { seat: PlayerSeat }) {
           {player?.loading ? <Loader2 className="animate-spin mr-2 h-4 w-4" /> : null}
           {player?.loading ? 'Loading…' : 'Load Deck'}
         </Button>
+
+        {player?.parseErrors && player.parseErrors.length > 0 && (
+          <div className="rounded-md bg-yellow-950/60 border border-yellow-600/40 p-3 space-y-1">
+            <p className="text-yellow-400 text-xs font-semibold">
+              {player.parseErrors.length} card{player.parseErrors.length > 1 ? 's' : ''} could not be found:
+            </p>
+            <ul className="space-y-0.5">
+              {player.parseErrors.map((err, i) => (
+                <li key={i} className="text-yellow-300/80 text-xs font-mono">
+                  {err.line}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </CardContent>
     </Card>
   )
