@@ -1,5 +1,5 @@
 import ReactMarkdown from 'react-markdown'
-import type { AnalysisReport } from '@/types/analysis'
+import type { AnalysisReport, PlayerScore } from '@/types/analysis'
 
 interface ReportProps {
   report: AnalysisReport
@@ -10,7 +10,7 @@ export default function BalanceReport({ report }: ReportProps) {
     <div className="space-y-6">
       {/* Per-player power bars */}
       <div className="space-y-4">
-        {report.scores.map(s => (
+        {report.scores.map((s: PlayerScore) => (
           <div key={s.seat} className="space-y-1.5">
             <div className="flex justify-between text-white text-sm">
               <span className="font-medium">{s.name}</span>

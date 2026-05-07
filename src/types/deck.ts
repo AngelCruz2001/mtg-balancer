@@ -1,5 +1,5 @@
-import type { AnalysisReport } from './analysis'
 import type { DeckCard } from './card'
+import type { AnalysisReport } from './analysis'
 
 export type PlayerSeat = 1 | 2 | 3 | 4
 

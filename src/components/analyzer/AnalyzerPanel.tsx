@@ -24,14 +24,14 @@ export default function AnalyzerPanel() {
         body: JSON.stringify({ players }),
       })
 
-      const data: AnalysisReport = await res.json()
+      const data = await res.json()
 
       if (!res.ok) {
         throw new Error(data.error || 'Analysis failed')
       }
 
-      setReport(data)
-      setBalanceReport(data)
+      setReport(data as AnalysisReport)
+      setBalanceReport(data as AnalysisReport)
     } catch (e) {
       setError((e as Error).message)
     } finally {
@@ -44,13 +44,13 @@ export default function AnalyzerPanel() {
       <div className="flex items-center justify-between">
         <div className="space-y-1">
           <h2 className="text-white text-xl font-semibold flex items-center gap-2">
-            <BarChart2 className="h-5 w-5 text-green-400" /> 
+            <BarChart2 className="h-5 w-5 text-green-400" />
             Balance Analysis
           </h2>
           <p className="text-white/40 text-xs">AI-powered deck comparison and fairness report</p>
         </div>
-        <Button 
-          onClick={analyze} 
+        <Button
+          onClick={analyze}
           disabled={loading || players.length < 2}
           className="bg-green-600 hover:bg-green-500 text-white border-none"
         >
@@ -87,7 +87,7 @@ export default function AnalyzerPanel() {
           </div>
         )
       )}
-      
+
       {loading && !report && (
         <div className="py-12 flex flex-col items-center justify-center text-center space-y-4">
           <div className="relative">

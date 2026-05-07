@@ -1,17 +1,17 @@
 ---
 id: data-001
-title: 'AnalysisReport shared type and typed store'
-status: ready
+title: AnalysisReport shared type and typed store
+status: in_progress
 phase: 2
 area: data
-created: 2026-05-06
+created: 2026-05-06T00:00:00.000Z
 complexity: low
 agent: gemini
 implementer: gemini
 tags:
-  - status/ready
   - phase/2
   - area/data
+  - status/in_progress
 files:
   - src/types/analysis.ts
   - src/types/deck.ts
@@ -20,8 +20,8 @@ files:
   - src/components/analyzer/BalanceReport.tsx
 depends_on: []
 related:
-  - "[[data-002-deck-parse-errors]]"
-  - "[[api-001-analysis-module]]"
+  - '[[data-002-deck-parse-errors]]'
+  - '[[api-001-analysis-module]]'
 ---
 
 # data-001 — AnalysisReport shared type and typed store
