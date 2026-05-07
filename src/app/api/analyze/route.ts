@@ -3,9 +3,7 @@ import { NextResponse } from 'next/server'
 import type { Player } from '@/types/deck'
 import { buildAnalysisPrompt, parseAnalysisResponse } from '@/lib/analysis'
 
-const client = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-})
+const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
 export async function POST(req: Request) {
   try {

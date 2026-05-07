@@ -1,17 +1,17 @@
 ---
 id: data-002
-title: 'Structured deck validation with per-card error reporting'
-status: ready
+title: Structured deck validation with per-card error reporting
+status: in_progress
 phase: 2
 area: data
-created: 2026-05-06
+created: 2026-05-06T00:00:00.000Z
 complexity: medium
 agent: gemini
 implementer: gemini
 tags:
-  - status/ready
   - phase/2
   - area/data
+  - status/in_progress
 files:
   - src/lib/scryfall.ts
   - src/types/deck.ts
@@ -19,8 +19,8 @@ files:
 depends_on:
   - data-001
 related:
-  - "[[data-001-analysis-report-type]]"
-  - "[[ui-001-parse-error-display]]"
+  - '[[data-001-analysis-report-type]]'
+  - '[[ui-001-parse-error-display]]'
 ---
 
 # data-002 — Structured deck validation with per-card error reporting

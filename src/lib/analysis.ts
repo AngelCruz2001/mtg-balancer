@@ -32,17 +32,9 @@ export function parseAnalysisResponse(text: string): AnalysisReport {
   if (!jsonMatch) {
     throw new Error('No JSON object found in analysis response')
   }
-
-  try {
-    const parsed = JSON.parse(jsonMatch[0]) as AnalysisReport
-    if (!Array.isArray(parsed.scores) || typeof parsed.explanation !== 'string') {
-      throw new Error('Analysis response does not match expected AnalysisReport shape')
-    }
-    return parsed
-  } catch (error) {
-    if (error instanceof Error && error.message.includes('Analysis response does not match')) {
-      throw error
-    }
-    throw new Error('Failed to parse analysis response as JSON')
+  const parsed = JSON.parse(jsonMatch[0]) as AnalysisReport
+  if (!Array.isArray(parsed.scores) || typeof parsed.explanation !== 'string') {
+    throw new Error('Analysis response does not match expected AnalysisReport shape')
   }
+  return parsed
 }

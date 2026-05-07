@@ -22,24 +22,26 @@ export const useAppStore = create<AppState>()(set => ({
     set(s => ({
       players: [
         ...s.players.filter(p => p.seat !== seat),
-        { seat, name, deckRaw: '', cards: [], loading: false, error: null },
+        { seat, name, deckRaw: '', cards: [], parseErrors: [], loading: false, error: null },
       ],
     })),
 
   loadDeck: async (seat, rawText) => {
     set(s => ({
       players: s.players.map(p =>
-        p.seat === seat ? { ...p, deckRaw: rawText, loading: true, error: null } : p
+        p.seat === seat
+          ? { ...p, deckRaw: rawText, loading: true, error: null, parseErrors: [] }
+          : p
       ),
     }))
 
     try {
       const lines = rawText.split('\n')
-      const cards = await fetchDeck(lines)
+      const { cards, errors } = await fetchDeck(lines)
 
       set(s => ({
         players: s.players.map(p =>
-          p.seat === seat ? { ...p, cards, loading: false } : p
+          p.seat === seat ? { ...p, cards, parseErrors: errors, loading: false } : p
         ),
       }))
     } catch (e) {

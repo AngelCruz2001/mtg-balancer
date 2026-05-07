@@ -150,3 +150,9 @@ Delete the old `buildPrompt` function and the inline JSON parsing from `route.ts
 - [ ] `parseAnalysisResponse` throws a descriptive error when text contains no JSON object
 - [ ] `parseAnalysisResponse` throws a descriptive error when the parsed JSON does not have `scores` array and `explanation` string
 - [ ] Analyzing a deck from the browser still returns a valid report
+
+
+## Log
+
+> [!warning] Retry 2026-05-07 — attempt 1 failed, retrying with error context
+> **Error fed back:** [typecheck]
