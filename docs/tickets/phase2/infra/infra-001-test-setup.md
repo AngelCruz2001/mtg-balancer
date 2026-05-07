@@ -1,17 +1,17 @@
 ---
 id: infra-001
-title: 'Vitest setup and minimal test coverage for parsing and analysis'
-status: ready
+title: Vitest setup and minimal test coverage for parsing and analysis
+status: in_progress
 phase: 2
 area: infra
-created: 2026-05-06
+created: 2026-05-06T00:00:00.000Z
 complexity: medium
 agent: gemini
 implementer: gemini
 tags:
-  - status/ready
   - phase/2
   - area/infra
+  - status/in_progress
 files:
   - vitest.config.ts
   - src/lib/analysis.test.ts
@@ -21,9 +21,9 @@ depends_on:
   - data-002
   - api-001
 related:
-  - "[[data-001-analysis-report-type]]"
-  - "[[data-002-deck-parse-errors]]"
-  - "[[api-001-analysis-module]]"
+  - '[[data-001-analysis-report-type]]'
+  - '[[data-002-deck-parse-errors]]'
+  - '[[api-001-analysis-module]]'
 ---
 
 # infra-001 — Vitest setup and minimal test coverage for parsing and analysis
