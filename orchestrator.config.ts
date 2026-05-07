@@ -4,7 +4,8 @@
 export default {
   projectName: 'mtg-deck-balancer',       // shown in the dashboard header
   ticketsDir: 'docs/tickets',  // where your TICK-NNN-*.md files live
-  baseBranch: "master",           // the branch you want to merge into (default: master)
+  baseBranch: "main",           // the branch you want to merge into (default: master)
+  
   port: 3141,                  // dashboard port (default: 3141)
   validate: [
     { name: 'typecheck', cmd: 'pnpm exec tsc --noEmit' },

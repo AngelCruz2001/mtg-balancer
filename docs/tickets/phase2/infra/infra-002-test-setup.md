@@ -1,7 +1,7 @@
 ---
 id: infra-001
 title: Vitest setup and minimal test coverage for parsing and analysis
-status: blocked
+status: done
 phase: 2
 area: infra
 created: 2026-05-06T00:00:00.000Z

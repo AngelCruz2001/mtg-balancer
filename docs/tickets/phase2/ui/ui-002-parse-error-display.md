@@ -1,7 +1,8 @@
+
 ---
 id: ui-001
 title: Show failed card names in deck loader UI
-status: blocked
+status: done
 phase: 2
 area: ui
 created: 2026-05-06T00:00:00.000Z
