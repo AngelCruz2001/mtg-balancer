@@ -1,7 +1,7 @@
 ---
 id: api-001
 title: Extract Anthropic analysis logic into dedicated module
-status: in_progress
+status: done
 phase: 2
 area: api
 created: 2026-05-06T00:00:00.000Z
@@ -11,7 +11,7 @@ implementer: gemini
 tags:
   - phase/2
   - area/api
-  - status/in_progress
+  - status/done
 files:
   - src/lib/analysis.ts
   - src/app/api/analyze/route.ts
@@ -154,5 +154,13 @@ Delete the old `buildPrompt` function and the inline JSON parsing from `route.ts
 
 ## Log
 
-> [!warning] Retry 2026-05-07 — attempt 1 failed, retrying with error context
-> **Error fed back:** [typecheck]
+> [!success] Completed 2026-05-07 — attempt 2/2
+> **Commit:** `c9d4cc7`
+> **Files written:** [[src/lib/analysis.ts]] · [[src/app/api/analyze/route.ts]]
+
+```mermaid
+graph LR
+  api-001["api-001"]
+  api-001 --> F0["src/lib/analysis.ts"]
+  api-001 --> F1["src/app/api/analyze/route.ts"]
+```
