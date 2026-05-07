@@ -1,23 +1,23 @@
 ---
 id: ui-001
-title: 'Show failed card names in deck loader UI'
-status: ready
+title: Show failed card names in deck loader UI
+status: in_progress
 phase: 2
 area: ui
-created: 2026-05-06
+created: 2026-05-06T00:00:00.000Z
 complexity: low
 agent: gemini
 implementer: gemini
 tags:
-  - status/ready
   - phase/2
   - area/ui
+  - status/in_progress
 files:
   - src/components/deck-loader/PlayerSlot.tsx
 depends_on:
   - data-002
 related:
-  - "[[data-002-deck-parse-errors]]"
+  - '[[data-002-deck-parse-errors]]'
 ---
 
 # ui-001 — Show failed card names in deck loader UI
