@@ -8,6 +8,9 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Loader2, AlertCircle } from 'lucide-react'
 import type { PlayerSeat } from '@/types/deck'
+import type { DeckParseError } from '@/types/deck'
+
+const EMPTY_PARSE_ERRORS: DeckParseError[] = []
 
 export default function PlayerSlot({ seat }: { seat: PlayerSeat }) {
   const [name, setName] = useState(`Player ${seat}`)
@@ -16,9 +19,7 @@ export default function PlayerSlot({ seat }: { seat: PlayerSeat }) {
   const addPlayer = useAppStore(s => s.addPlayer)
   const loadDeck = useAppStore(s => s.loadDeck)
   const player = useAppStore(s => s.players.find(p => p.seat === seat))
-  const parseErrors = useAppStore(s =>
-    s.players.find(p => p.seat === seat)?.parseErrors ?? []
-  )
+  const parseErrors = player?.parseErrors ?? EMPTY_PARSE_ERRORS
 
   async function handleLoad() {
     if (!raw.trim()) return

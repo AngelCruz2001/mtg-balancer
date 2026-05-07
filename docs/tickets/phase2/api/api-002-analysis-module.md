@@ -3,7 +3,7 @@
 ---
 id: api-002
 title: Extract Anthropic analysis logic into dedicated module
-status: ready
+status: done
 phase: 2
 area: api
 created: 2026-05-06T00:00:00.000Z
@@ -13,7 +13,7 @@ implementer: gemini
 tags:
   - phase/2
   - area/api
-  - status/ready
+  - status/done
 files:
   - src/lib/analysis.ts
   - src/app/api/analyze/route.ts

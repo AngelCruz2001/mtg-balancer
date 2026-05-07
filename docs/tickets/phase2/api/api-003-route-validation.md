@@ -1,7 +1,7 @@
 ---
 id: api-003
 title: Request and response validation for /api/analyze
-status: ready
+status: done
 phase: 2
 area: api
 created: 2026-05-06T00:00:00.000Z
@@ -11,7 +11,7 @@ implementer: gemini
 tags:
   - phase/2
   - area/api
-  - status/ready
+  - status/done
 files:
   - src/app/api/analyze/route.ts
   - src/lib/analysis.ts
