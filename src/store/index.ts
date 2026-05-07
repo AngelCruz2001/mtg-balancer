@@ -6,5 +6,5 @@ export interface AppState {
 }
 
 export const useAppStore = create<AppState>()(() => ({
-  players: [], // Minimal placeholder to satisfy some common usages if needed
+  players: [], // Minimal placeholder to prevent prerender errors in existing files
 }))

@@ -1,11 +1,7 @@
 ---
 id: infra-001
 title: Project scaffold — Next.js + Shadcn + Tailwind + Zustand
-<<<<<<< HEAD
-status: in_progress
-=======
-status: ready
->>>>>>> infra-001-impl
+status: blocked
 phase: 1
 area: infra
 created: 2026-05-06T00:00:00.000Z
@@ -15,11 +11,7 @@ implementer: claude
 tags:
   - phase/1
   - area/infra
-<<<<<<< HEAD
-  - status/in_progress
-=======
-  - status/ready
->>>>>>> infra-001-impl
+  - status/blocked
 files:
   - package.json
   - next.config.ts
@@ -127,4 +119,13 @@ npm run dev     # home page renders "MTG Deck Balancer"
 
 ```
 Agent made no file changes.
+```
+
+> [!danger] Blocked 2026-05-07 — failed 2/2 attempts
+> **Error:** git merge --no-ff --no-edit --autostash infra-001-impl
+> **Next step:** Human review required
+
+```
+git merge --no-ff --no-edit --autostash infra-001-impl
+
 ```
