@@ -1,7 +1,7 @@
 ---
 id: ui-001
 title: Show failed card names in deck loader UI
-status: in_progress
+status: blocked
 phase: 2
 area: ui
 created: 2026-05-06T00:00:00.000Z
@@ -11,7 +11,7 @@ implementer: gemini
 tags:
   - phase/2
   - area/ui
-  - status/in_progress
+  - status/blocked
 files:
   - src/components/deck-loader/PlayerSlot.tsx
 depends_on:
@@ -98,5 +98,11 @@ The `err.reason` message is intentionally not shown in the UI — it is a raw Sc
 
 ## Log
 
-> [!warning] Retry 2026-05-07 — attempt 1 failed, retrying with error context
-> **Error fed back:** [build]
+> [!danger] Blocked 2026-05-07 — failed 2/2 attempts
+> **Error:** git merge --no-ff --no-edit --autostash ui-001-impl
+> **Next step:** Human review required
+
+```
+git merge --no-ff --no-edit --autostash ui-001-impl
+
+```
