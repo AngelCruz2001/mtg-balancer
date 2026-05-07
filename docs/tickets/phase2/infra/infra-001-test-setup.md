@@ -1,17 +1,17 @@
 ---
 id: infra-001
-title: 'Vitest setup and minimal test coverage for parsing and analysis'
-status: ready
+title: Vitest setup and minimal test coverage for parsing and analysis
+status: blocked
 phase: 2
 area: infra
-created: 2026-05-06
+created: 2026-05-06T00:00:00.000Z
 complexity: medium
 agent: gemini
 implementer: gemini
 tags:
-  - status/ready
   - phase/2
   - area/infra
+  - status/blocked
 files:
   - vitest.config.ts
   - src/lib/analysis.test.ts
@@ -21,9 +21,9 @@ depends_on:
   - data-002
   - api-001
 related:
-  - "[[data-001-analysis-report-type]]"
-  - "[[data-002-deck-parse-errors]]"
-  - "[[api-001-analysis-module]]"
+  - '[[data-001-analysis-report-type]]'
+  - '[[data-002-deck-parse-errors]]'
+  - '[[api-001-analysis-module]]'
 ---
 
 # infra-001 — Vitest setup and minimal test coverage for parsing and analysis
@@ -235,3 +235,27 @@ describe('fetchDeck', () => {
 - [ ] All `scryfall.test.ts` cases pass (3 tests)
 - [ ] `fetchCard` is never called during scryfall tests (network mocked)
 - [ ] Test files do not import from `src/app/` — tests are limited to lib modules
+
+
+## Log
+
+> [!danger] Blocked 2026-05-07 — failed 2/2 attempts
+> **Error:** git merge --no-ff --no-edit --autostash infra-001-impl
+> **Next step:** Human review required
+
+```
+git merge --no-ff --no-edit --autostash infra-001-impl
+error: short read while indexing .next/server/app-paths-manifest.json
+error: short read while indexing .next/server/app-paths-manifest.json
+error: short read while indexing .next/server/pages-manifest.json
+error: short read while indexing .next/server/pages-manifest.json
+error: short read while indexing .next/server/server-reference-manifest.json
+error: short read while indexing .next/server/server-reference-manifest.json
+warning: in the working copy of '.next/app-build-manifest.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.next/build-manifest.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.next/react-loadable-manifest.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.next/server/app-paths-manifest.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.next/server/middleware-build-manifest.js', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.next/server/pages-manifest.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of '.next/server/server-reference-manifest.json', LF will be replaced by CRLF the next time Git touches it
+```
