@@ -1,7 +1,7 @@
 ---
 id: data-002
 title: Structured deck validation with per-card error reporting
-status: in_progress
+status: done
 phase: 2
 area: data
 created: 2026-05-06T00:00:00.000Z
@@ -11,7 +11,7 @@ implementer: gemini
 tags:
   - phase/2
   - area/data
-  - status/in_progress
+  - status/done
 files:
   - src/lib/scryfall.ts
   - src/types/deck.ts
@@ -167,3 +167,18 @@ set(s => ({
 - [ ] Calling `loadDeck` with a valid decklist sets `parseErrors: []`
 - [ ] Calling `loadDeck` with one bad card name results in that card appearing in `player.parseErrors`
 - [ ] No existing cards are dropped from `player.cards` when one card fails
+
+
+## Log
+
+> [!success] Completed 2026-05-07 — attempt 1/2
+> **Commit:** `3af7ba9`
+> **Files written:** [[src/lib/scryfall.ts]] · [[src/types/deck.ts]] · [[src/store/index.ts]]
+
+```mermaid
+graph LR
+  data-002["data-002"]
+  data-002 --> F0["src/lib/scryfall.ts"]
+  data-002 --> F1["src/types/deck.ts"]
+  data-002 --> F2["src/store/index.ts"]
+```
