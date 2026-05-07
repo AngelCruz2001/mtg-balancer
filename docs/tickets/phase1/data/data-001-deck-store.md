@@ -1,7 +1,7 @@
 ---
 id: data-001
 title: Deck data model and Zustand store
-status: in_progress
+status: done
 phase: 1
 area: data
 created: 2026-05-06T00:00:00.000Z
@@ -11,7 +11,7 @@ implementer: gemini
 tags:
   - phase/1
   - area/data
-  - status/in_progress
+  - status/done
 files:
   - src/types/deck.ts
   - src/store/index.ts
