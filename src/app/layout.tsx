@@ -6,14 +6,14 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "MTG Deck Balancer",
-  description: "Magic: The Gathering deck balancing tool",
+  description: "Balance your MTG decks",
 };
 
 export default function RootLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode;
-}) {
+}>) {
   return (
     <html lang="en">
       <body className={inter.className}>{children}</body>
