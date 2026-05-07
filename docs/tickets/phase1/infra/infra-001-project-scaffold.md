@@ -1,7 +1,11 @@
 ---
 id: infra-001
 title: Project scaffold — Next.js + Shadcn + Tailwind + Zustand
+<<<<<<< HEAD
 status: in_progress
+=======
+status: ready
+>>>>>>> infra-001-impl
 phase: 1
 area: infra
 created: 2026-05-06T00:00:00.000Z
@@ -11,7 +15,11 @@ implementer: claude
 tags:
   - phase/1
   - area/infra
+<<<<<<< HEAD
   - status/in_progress
+=======
+  - status/ready
+>>>>>>> infra-001-impl
 files:
   - package.json
   - next.config.ts
