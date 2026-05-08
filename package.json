@@ -11,29 +11,31 @@
     "test:watch": "vitest"
   },
   "dependencies": {
-    "zustand": "^5.0.4",
+    "@anthropic-ai/sdk": "^0.95.0",
+    "@radix-ui/react-slot": "^1.2.4",
+    "@supabase/ssr": "^0.10.3",
+    "@supabase/supabase-js": "^2.105.4",
+    "@tailwindcss/typography": "^0.5.19",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.513.0",
     "next": "^15.1.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "lucide-react": "^0.513.0",
-    "class-variance-authority": "^0.7.1",
-    "clsx": "^2.1.1",
+    "react-markdown": "^10.1.0",
     "tailwind-merge": "^3.0.0",
     "tailwindcss-animate": "^1.0.7",
-    "@anthropic-ai/sdk": "^0.95.0",
-    "@radix-ui/react-slot": "^1.2.4",
-    "react-markdown": "^10.1.0",
-    "@tailwindcss/typography": "^0.5.19"
+    "zustand": "^5.0.4"
   },
   "devDependencies": {
-    "typescript": "^5",
+    "@tailwindcss/postcss": "^4.0.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@vitest/coverage-v8": "^2.1.8",
     "postcss": "^8",
     "tailwindcss": "^4.0.0",
-    "@tailwindcss/postcss": "^4.0.0",
-    "vitest": "^2.1.8",
-    "@vitest/coverage-v8": "^2.1.8"
+    "typescript": "^5",
+    "vitest": "^2.1.8"
   }
 }

@@ -5,6 +5,8 @@ import type { Player } from '@/types/deck'
 const mockPlayer = (seat: number, name: string): Player => ({
   seat: seat as 1 | 2 | 3 | 4,
   name,
+  commander: '',
+  colors: [],
   deckRaw: '',
   cards: [
     { quantity: 4, card: { id: 'a', name: 'Lightning Bolt', mana_cost: '{R}', cmc: 1, type_line: 'Instant', colors: ['R'], color_identity: ['R'], prices: { usd: '0.50', eur: null, tix: null }, legalities: {} } },

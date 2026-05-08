@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MTG Deck Balancer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600;1,700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+  <style>
+    :root {
+      --c-bg:       oklch(7.5% 0.018 165);
+      --c-surface:  oklch(11.5% 0.022 162);
+      --c-raised:   oklch(15% 0.025 160);
+      --c-border:   oklch(22% 0.028 158);
+      --c-sub:      oklch(17% 0.02 160);
+      --c-green:    oklch(57% 0.205 162);
+      --c-green-hi: oklch(66% 0.22 162);
+      --c-green-bg: oklch(25% 0.08 162 / 0.22);
+      --c-gold:     oklch(73% 0.17 82);
+      --c-gold-dim: oklch(56% 0.13 82);
+      --c-gold-bg:  oklch(22% 0.08 82 / 0.2);
+      --c-text:     oklch(93% 0.01 160);
+      --c-text2:    oklch(68% 0.022 160);
+      --c-text3:    oklch(46% 0.015 160);
+      --c-red:      oklch(60% 0.22 20);
+      --rad: 14px; --rad-lg: 20px; --rad-xl: 28px;
+      --ease: cubic-bezier(0.16, 1, 0.3, 1); --dur: 220ms;
+    }
+    body.theme-obsidian {
+      --c-bg:       oklch(6% 0.012 270);
+      --c-surface:  oklch(9.5% 0.016 268);
+      --c-raised:   oklch(13% 0.02 266);
+      --c-border:   oklch(20% 0.022 265);
+      --c-sub:      oklch(15% 0.016 268);
+      --c-green:    oklch(60% 0.18 200);
+      --c-green-hi: oklch(68% 0.20 200);
+      --c-green-bg: oklch(22% 0.07 200 / 0.2);
+      --c-gold:     oklch(70% 0.14 50);
+      --c-gold-dim: oklch(52% 0.10 50);
+      --c-gold-bg:  oklch(18% 0.07 50 / 0.18);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { color-scheme: dark; }
+    body {
+      background: var(--c-bg);
+      background-image:
+        radial-gradient(ellipse 70% 32% at 50% -2%, oklch(28% 0.10 162 / 0.16), transparent),
+        radial-gradient(circle at 90% 6%, oklch(22% 0.10 82 / 0.10), transparent 24%);
+      background-attachment: fixed;
+      color: var(--c-text); font-family: 'Outfit', sans-serif;
+      font-weight: 400; -webkit-font-smoothing: antialiased; min-height: 100vh;
+    }
+    body.theme-obsidian {
+      background-image:
+        radial-gradient(ellipse 70% 32% at 50% -2%, oklch(22% 0.09 220 / 0.14), transparent),
+        radial-gradient(circle at 90% 6%, oklch(18% 0.08 50 / 0.08), transparent 24%);
+    }
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-thumb { background: var(--c-border); border-radius: 99px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+
+    @keyframes fadeUp   { from { opacity:0; transform:translateY(10px) } to { opacity:1; transform:none } }
+    @keyframes fadeIn   { from { opacity:0 } to { opacity:1 } }
+    @keyframes slideR   { from { opacity:0; transform:translateX(18px) } to { opacity:1; transform:none } }
+    @keyframes slideL   { from { opacity:0; transform:translateX(-18px) } to { opacity:1; transform:none } }
+    @keyframes spin     { to { transform: rotate(360deg) } }
+    @keyframes pulse    { 0%,100%{opacity:1} 50%{opacity:.3} }
+    @keyframes glow     { 0%,100%{box-shadow:0 0 0 0 var(--c-green-bg)} 50%{box-shadow:0 0 28px 6px var(--c-green-bg)} }
+
+    .afu { animation: fadeUp 280ms var(--ease) both }
+    .afi { animation: fadeIn 200ms ease both }
+    .asr { animation: slideR 280ms var(--ease) both }
+    .asl { animation: slideL 280ms var(--ease) both }
+
+    button { cursor:pointer; border:none; font-family:inherit; transition:all var(--dur) var(--ease); }
+    button:disabled { opacity:.38; pointer-events:none; }
+
+    .btn-primary {
+      background: var(--c-green); color: oklch(10% 0.025 162);
+      padding: 11px 22px; border-radius: var(--rad);
+      font-size: 14px; font-weight: 600; letter-spacing:.01em;
+      display:inline-flex; align-items:center; gap:8px;
+      box-shadow: 0 4px 16px -4px oklch(57% .205 162 / .45);
+    }
+    .btn-primary:hover:not(:disabled) { background:var(--c-green-hi); transform:translateY(-1px); box-shadow:0 8px 24px -6px oklch(57% .205 162 / .55); }
+
+    .btn-gold {
+      background: var(--c-gold); color: oklch(15% 0.05 82);
+      padding: 13px 30px; border-radius: var(--rad-lg);
+      font-size: 15px; font-weight: 600; letter-spacing:.01em;
+      display:inline-flex; align-items:center; gap:8px;
+      box-shadow: 0 4px 20px -6px oklch(73% .17 82 / .45);
+    }
+    .btn-gold:hover:not(:disabled) { background:oklch(77% .18 82); transform:translateY(-1px); box-shadow:0 8px 28px -6px oklch(73% .17 82 / .55); }
+
+    .btn-ghost {
+      background:transparent; color:var(--c-text2);
+      padding:8px 14px; border-radius:var(--rad);
+      font-size:13px; font-weight:500;
+      border:1px solid var(--c-sub);
+      display:inline-flex; align-items:center; gap:6px;
+    }
+    .btn-ghost:hover { background:var(--c-raised); color:var(--c-text); }
+
+    .btn-icon {
+      width:36px; height:36px; border-radius:50%;
+      background:var(--c-raised); border:1px solid var(--c-sub);
+      color:var(--c-text2); display:flex; align-items:center; justify-content:center;
+      font-size:15px;
+    }
+    .btn-icon:hover { background:var(--c-border); color:var(--c-text); }
+
+    .card  { background:var(--c-surface); border:1px solid var(--c-sub);   border-radius:var(--rad-lg); }
+    .panel { background:var(--c-raised);  border:1px solid var(--c-border); border-radius:var(--rad-xl); }
+
+    .badge-green  { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:99px; font-size:11px; font-weight:600; letter-spacing:.04em; background:var(--c-green-bg); border:1px solid oklch(57% .205 162 / .28); color:var(--c-green-hi); }
+    .badge-gold   { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:99px; font-size:11px; font-weight:600; letter-spacing:.04em; background:var(--c-gold-bg);  border:1px solid oklch(73% .17 82 / .28);    color:var(--c-gold); }
+    .badge-muted  { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:99px; font-size:11px; font-weight:600; letter-spacing:.04em; background:oklch(18% .02 160);border:1px solid var(--c-sub); color:var(--c-text2); }
+    .badge-red    { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:99px; font-size:11px; font-weight:600; letter-spacing:.04em; background:oklch(18% .08 20/.18); border:1px solid oklch(60% .22 20/.28); color:oklch(68% .18 20); }
+
+    .kicker { font-size:10px; font-weight:700; letter-spacing:.25em; text-transform:uppercase; color:var(--c-gold); font-family:'Outfit', sans-serif; }
+    .df     { font-family:'Cormorant Garamond', serif; font-style:italic; letter-spacing:-.03em; line-height:1.05; }
+
+    input, textarea {
+      width:100%; background:var(--c-bg); border:1px solid var(--c-sub);
+      color:var(--c-text); font-family:'Outfit', sans-serif; font-size:14px;
+      border-radius:var(--rad); padding:10px 14px; outline:none;
+      transition:border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+    }
+    input:focus, textarea:focus { border-color:var(--c-green); box-shadow:0 0 0 3px oklch(57% .205 162 / .12); }
+    input::placeholder, textarea::placeholder { color:var(--c-text3); }
+    textarea { resize:none; line-height:1.6; font-size:12.5px; font-family:monospace; }
+
+    .modal-bg { position:fixed; inset:0; background:oklch(0% 0 0 / .65); z-index:90; display:flex; align-items:center; justify-content:center; animation:fadeIn 200ms ease; }
+    .modal    { background:var(--c-raised); border:1px solid var(--c-border); border-radius:var(--rad-xl); width:min(480px,92vw); padding:28px; animation:fadeUp 280ms var(--ease); }
+    .side-panel { position:fixed; top:0; right:0; bottom:0; width:300px; background:var(--c-surface); border-left:1px solid var(--c-border); z-index:100; padding:24px; overflow-y:auto; animation:slideR 250ms var(--ease); }
+
+    .spinner { width:20px; height:20px; border:2px solid var(--c-sub); border-top-color:var(--c-green); border-radius:50%; animation:spin .75s linear infinite; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel" src="tweaks-panel.jsx"></script>
+  <script type="text/babel" src="mtg-components.jsx"></script>
+  <script type="text/babel">
+  const { useState, useEffect, useRef } = React;
+
+  // ── Sample profiles ──────────────────────────────────────────────────────
+  const PROFILES = [
+    { key:'atraxa', dName:'Alex', commander:"Atraxa, Praetors' Voice", colors:['W','U','B','G'],
+      stats:{ total:100, lands:37, spells:63, avgCmc:'3.1', curve:[0,8,14,17,11,7,4,2] },
+      groups:[
+        { l:'Creatures',     n:22, cards:["Atraxa, Praetors' Voice","Vorinclex, Voice of Hunger","Sheoldred, Whispering One","Elesh Norn, Grand Cenobite","Deepglow Skate","Seedborn Muse","Consecrated Sphinx","Oracle of Mul Daya","Jin-Gitaxias, Core Augur"] },
+        { l:'Planeswalkers', n:7,  cards:["Ugin, the Spirit Dragon","Teferi, Hero of Dominaria","Tamiyo, Field Researcher","Jace Beleren","Elspeth, Sun's Champion","Liliana of the Veil","Nissa, Vital Force"] },
+        { l:'Instants',      n:8,  cards:["Cyclonic Rift","Mana Drain","Force of Will","Swords to Plowshares","Path to Exile","Fierce Guardianship"] },
+        { l:'Sorceries',     n:8,  cards:["Demonic Tutor","Vampiric Tutor","Tooth and Nail","Windfall","Toxic Deluge","Supreme Verdict"] },
+        { l:'Enchantments',  n:8,  cards:["Doubling Season","Rhystic Study","Sylvan Library","Smothering Tithe","Phyrexian Arena","Mirari's Wake"] },
+        { l:'Artifacts',     n:10, cards:["Sol Ring","Arcane Signet","Sensei's Divining Top","Contagion Engine","Chromatic Lantern","Inexorable Tide"] },
+        { l:'Lands',         n:37, cards:["Command Tower","Breeding Pool","Godless Shrine","Overgrown Tomb","Temple Garden","Yavimaya, Cradle of Growth","+ 31 more"] },
+      ],
+      analysis:{ score:82, label:'Overpowered',    summary:'Persistent proliferate engine with overwhelming late-game inevitability.', dimensions:[.85,.44,.81,.71,.91] }
+    },
+    { key:'krenko', dName:'Sam', commander:'Krenko, Mob Boss', colors:['R'],
+      stats:{ total:100, lands:36, spells:64, avgCmc:'2.1', curve:[2,16,22,14,6,3,1,0] },
+      groups:[
+        { l:'Creatures',    n:34, cards:["Krenko, Mob Boss","Muxus, Goblin Grandee","Goblin Guide","Goblin Warchief","Goblin Chieftain","Goblin Piledriver","Siege-Gang Commander","Purphoros, God of the Forge","Warren Instigator"] },
+        { l:'Instants',     n:8,  cards:["Lightning Bolt","Chain Lightning","Goblin Grenade","Searing Spear","Arc Trail"] },
+        { l:'Sorceries',    n:5,  cards:["Goblin War Strike","Empty the Warrens","Vandalblast"] },
+        { l:'Enchantments', n:5,  cards:["Impact Tremors","Shared Animosity","Fervor","Hammer of Purphoros"] },
+        { l:'Artifacts',    n:12, cards:["Sol Ring","Arcane Signet","Skullclamp","Phyrexian Altar","Coat of Arms","Thousand-Year Elixir"] },
+        { l:'Lands',        n:36, cards:["Mountain (×36)","Command Tower"] },
+      ],
+      analysis:{ score:65, label:'Balanced',       summary:'Explosive burst turns but folds to single board wipes or targeted removal.', dimensions:[.65,.93,.38,.28,.79] }
+    },
+    { key:'oloro', dName:'Jamie', commander:'Oloro, Ageless Ascetic', colors:['W','U','B'],
+      stats:{ total:100, lands:38, spells:62, avgCmc:'3.0', curve:[1,8,14,18,13,6,2,0] },
+      groups:[
+        { l:'Creatures',    n:16, cards:["Oloro, Ageless Ascetic","Serra Ascendant","Archangel of Thune","Ajani's Pridemate","Blood Artist","Zulaport Cutthroat","Vito, Thorn of the Dusk Rose","Divinity of Pride"] },
+        { l:'Instants',     n:8,  cards:["Swords to Plowshares","Path to Exile","Counterspell","Absorb","Teferi's Protection"] },
+        { l:'Sorceries',    n:6,  cards:["Wrath of God","Supreme Verdict","Toxic Deluge","Read the Bones"] },
+        { l:'Enchantments', n:14, cards:["Exquisite Blood","Sanguine Bond","Rhystic Study","Necropotence","Propaganda","Ghostly Prison","Boon Reflection"] },
+        { l:'Artifacts',    n:18, cards:["Aetherflux Reservoir","Sol Ring","Well of Lost Dreams","Alhammarret's Archive","Loxodon Warhammer"] },
+        { l:'Lands',        n:38, cards:["Hallowed Fountain","Watery Grave","Godless Shrine","Command Tower","Plains (×7)","Island (×6)"] },
+      ],
+      analysis:{ score:58, label:'Balanced',       summary:'Powerful in grindy long games but too slow to keep pace with top-tier threats.', dimensions:[.59,.33,.89,.56,.63] }
+    },
+    { key:'muldrotha', dName:'Morgan', commander:'Muldrotha, the Gravetide', colors:['U','B','G'],
+      stats:{ total:100, lands:36, spells:64, avgCmc:'2.8', curve:[3,10,16,18,10,5,2,0] },
+      groups:[
+        { l:'Creatures',    n:20, cards:["Muldrotha, the Gravetide","Sakura-Tribe Elder","Eternal Witness","Glen Elendra Archmage","The Gitrog Monster","Mulldrifter","Spore Frog","Lord of Extinction"] },
+        { l:'Instants',     n:8,  cards:["Cyclonic Rift","Assassin's Trophy","Abrupt Decay","Force of Will","Sultai Charm"] },
+        { l:'Sorceries',    n:10, cards:["Life from the Loam","Buried Alive","Entomb","Cultivate","Kodama's Reach","Thoughtseize"] },
+        { l:'Enchantments', n:8,  cards:["Animate Dead","Dance of the Dead","Rhystic Study","Mystic Remora","Sylvan Library"] },
+        { l:'Artifacts',    n:18, cards:["Sol Ring","Nihil Spellbomb","Crucible of Worlds","Oblivion Stone","Arcane Signet","Wayfarer's Bauble"] },
+        { l:'Lands',        n:36, cards:["Breeding Pool","Overgrown Tomb","Watery Grave","Command Tower","Forest (×7)","Island (×5)"] },
+      ],
+      analysis:{ score:74, label:'Above Average', summary:'Consistent value engine that recovers well and applies steady compounding pressure.', dimensions:[.74,.51,.76,.67,.82] }
+    },
+  ];
+
+  const ACCENTS = [
+    { c:'oklch(65% 0.22 162)', bg:'oklch(20% 0.08 162 / 0.15)' },
+    { c:'oklch(72% 0.17 82)',  bg:'oklch(20% 0.08 82 / 0.15)'  },
+    { c:'oklch(62% 0.18 225)', bg:'oklch(18% 0.07 225 / 0.15)' },
+    { c:'oklch(62% 0.20 20)',  bg:'oklch(18% 0.08 20 / 0.15)'  },
+  ];
+
+  const HISTORY = [
+    { id:1, date:'May 6',  label:'Last night', players:['Alex','Sam','Jamie'],        spread:24, top:'Alex (Atraxa)',    scores:[82,65,58] },
+    { id:2, date:'May 3',  label:'3 days ago', players:['Morgan','Sam','Alex','Jamie'],spread:24, top:'Alex (Atraxa)',    scores:[74,62,82,55] },
+    { id:3, date:'Apr 28', label:'Last week',  players:['Alex','Morgan'],              spread:8,  top:'Alex (Atraxa)',    scores:[82,74] },
+  ];
+
+  const LOADING_MSGS = ['Mapping synergy vectors…','Reading the mana base…','Weighing threat density…','Consulting the Oracle…','Calculating power spread…'];
+
+  const mkPlayer = id => ({ id, name:'', commander:'', colors:[], deckRaw:'', status:'empty', profile:null, stats:null, expanded:false });
+
+  function parseDeck(raw) {
+    const lines = raw.split('\n').map(l=>l.trim()).filter(l=>l && !l.startsWith('//') && !l.startsWith('#'));
+    let total=0; const cards=[];
+    lines.forEach(line => {
+      const m = line.match(/^(\d+)[x\s]+(.+)/i);
+      if(m){ const qty=parseInt(m[1]); total+=qty; cards.push({qty, name:m[2].replace(/\s*\(.*\).*$/,'').trim()}); }
+    });
+    if(total<2) return null;
+    const lands=Math.round(total*.37); const spells=total-lands;
+    const d=[.03,.14,.22,.26,.17,.10,.05,.03];
+    return { total, lands, spells, avgCmc:(2.4+Math.random()*.8).toFixed(1), curve:d.map(p=>Math.round(spells*p)), cards };
+  }
+
+  // ── Step 1 ───────────────────────────────────────────────────────────────
+  function Step1({ count, setCount, players, upd, onNext }) {
+    const active = players.slice(0,count);
+    const canGo  = active.every(p=>p.name.trim().length>0);
+    return (
+      <div className="afu" style={{ display:'flex', flexDirection:'column', gap:32 }}>
+        <div>
+          <div className="kicker" style={{marginBottom:10}}>Step 1 of 3</div>
+          <h1 className="df" style={{fontSize:52, color:'var(--c-text)', marginBottom:12}}>Build the Pod</h1>
+          <p style={{color:'var(--c-text2)', fontSize:16, maxWidth:440}}>How many players are sitting down? Name each seat before continuing.</p>
+        </div>
+
+        <div style={{display:'flex', gap:12}}>
+          {[2,3,4].map((n,i) => (
+            <button key={n} onClick={()=>setCount(n)} style={{
+              flex:1, padding:'16px 12px', borderRadius:'var(--rad-lg)',
+              background: count===n ? 'var(--c-green-bg)' : 'var(--c-surface)',
+              border: `1.5px solid ${count===n ? 'oklch(57% .205 162 / .45)' : 'var(--c-sub)'}`,
+              display:'flex', flexDirection:'column', alignItems:'center', gap:6,
+              color: count===n ? 'var(--c-green-hi)' : 'var(--c-text2)',
+              transition:'all var(--dur) var(--ease)',
+            }}>
+              <span style={{fontSize:28, fontWeight:700, lineHeight:1}}>{n}</span>
+              <span style={{fontSize:12, fontWeight:500, letterSpacing:'.05em'}}>{['Two','Three','Four'][i]} players</span>
+            </button>
+          ))}
+        </div>
+
+        <div style={{display:'grid', gridTemplateColumns:`repeat(${count > 2 ? count : 2}, 1fr)`, gap:12}}>
+          {Array.from({length:count},(_,i)=>(
+            <div key={i}>
+              <label style={{display:'block', fontSize:11, fontWeight:600, letterSpacing:'.18em', textTransform:'uppercase', color:ACCENTS[i].c, marginBottom:8}}>
+                Player {i+1}
+              </label>
+              <input
+                placeholder={`e.g. ${['Alex','Sam','Jamie','Morgan'][i]}`}
+                value={players[i].name}
+                onChange={e=>upd(i,{name:e.target.value})}
+                style={{borderColor: players[i].name ? 'var(--c-sub)' : 'var(--c-sub)'}}
+              />
+            </div>
+          ))}
+        </div>
+
+        <div style={{display:'flex', justifyContent:'flex-end'}}>
+          <button className="btn-gold" onClick={onNext} disabled={!canGo}>
+            Load the Lists <span style={{opacity:.7}}>→</span>
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Step 2 ───────────────────────────────────────────────────────────────
+  function PlayerSlot({ player, idx, upd, loadDemo, loadDeck }) {
+    const acc = ACCENTS[idx];
+    const st  = player.status;
+    return (
+      <div className="card" style={{
+        padding:20, display:'flex', flexDirection:'column', gap:16,
+        borderColor: st==='loaded' ? `oklch(57% .205 162 / .35)` : acc.c+'44',
+        boxShadow: st==='loaded' ? `0 0 28px -12px oklch(57% .205 162 / .25)` : 'none',
+        transition: 'border-color .3s ease, box-shadow .3s ease',
+      }}>
+        <div style={{display:'flex', alignItems:'center', justifyContent:'space-between'}}>
+          <div style={{display:'flex', alignItems:'center', gap:10}}>
+            <div style={{width:28, height:28, borderRadius:'50%', background:acc.bg, border:`1.5px solid ${acc.c}55`, display:'flex', alignItems:'center', justifyContent:'center', fontSize:12, fontWeight:700, color:acc.c, flexShrink:0}}>
+              {idx+1}
+            </div>
+            <span style={{fontWeight:600, fontSize:15}}>{player.name || `Player ${idx+1}`}</span>
+          </div>
+          {st==='loaded' && <span className="badge-green">✓ {player.stats?.total || player.profile?.stats?.total} cards</span>}
+          {st==='loading' && <span style={{display:'flex',alignItems:'center',gap:6,fontSize:12,color:'var(--c-text3)'}}><div className="spinner" style={{width:14,height:14}}/> Resolving…</span>}
+        </div>
+
+        {st==='loaded' ? (
+          <div style={{display:'flex', flexDirection:'column', gap:10}}>
+            <div style={{display:'flex', alignItems:'center', gap:8, flexWrap:'wrap'}}>
+              <ColorPips colors={player.colors} size={22} />
+              {player.commander && <span style={{fontSize:12, color:'var(--c-gold)', fontStyle:'italic', fontFamily:"'Cormorant Garamond', serif"}}>{player.commander}</span>}
+            </div>
+            {(() => { const s=player.profile?.stats||player.stats; return s ? (
+              <div style={{display:'flex', gap:8}}>
+                {[['Total',s.total],['Lands',s.lands],['Avg CMC',s.avgCmc]].map(([l,v])=>(
+                  <div key={l} style={{flex:1, background:'var(--c-bg)', border:'1px solid var(--c-sub)', borderRadius:10, padding:'8px 10px'}}>
+                    <div style={{fontSize:9, fontWeight:700, letterSpacing:'.18em', textTransform:'uppercase', color:'var(--c-text3)', marginBottom:4}}>{l}</div>
+                    <div style={{fontSize:17, fontWeight:600}}>{v}</div>
+                  </div>
+                ))}
+              </div>
+            ) : null; })()}
+            <button className="btn-ghost" style={{fontSize:12, padding:'6px 12px', alignSelf:'flex-start'}} onClick={()=>upd(idx,{status:'empty',profile:null,stats:null,expanded:false,deckRaw:'',colors:[],commander:''})}>
+              ✕ Change deck
+            </button>
+          </div>
+        ) : (
+          <>
+            <div style={{display:'flex', flexDirection:'column', gap:8}}>
+              <div style={{display:'flex', alignItems:'center', justifyContent:'space-between'}}>
+                <span style={{fontSize:10, fontWeight:600, letterSpacing:'.18em', textTransform:'uppercase', color:'var(--c-text3)'}}>Color Identity</span>
+                <ColorPicker selected={player.colors} onChange={c=>upd(idx,{colors:c})} size={24} />
+              </div>
+              <input placeholder="Commander name (optional)" value={player.commander} onChange={e=>upd(idx,{commander:e.target.value})} style={{fontSize:13}} />
+            </div>
+
+            <div style={{borderRadius:'var(--rad)', border:'1px solid var(--c-sub)', overflow:'hidden'}}>
+              <button onClick={()=>upd(idx,{expanded:!player.expanded})} style={{
+                width:'100%', padding:'10px 14px', background:'var(--c-bg)',
+                display:'flex', alignItems:'center', justifyContent:'space-between',
+                color:'var(--c-text2)', fontSize:13, fontWeight:500,
+              }}>
+                <span>{player.deckRaw ? `${player.deckRaw.split('\n').filter(l=>l.trim().match(/^\d+/)).length} lines pasted` : 'Paste decklist…'}</span>
+                <span style={{fontSize:11, opacity:.6, transform:player.expanded?'rotate(180deg)':'none', transition:'transform .2s'}}>{player.expanded ? '▲' : '▼'}</span>
+              </button>
+              {player.expanded && (
+                <textarea
+                  rows={9} placeholder={"1 Sol Ring\n1 Command Tower\n38 Forest\n..."}
+                  value={player.deckRaw} onChange={e=>upd(idx,{deckRaw:e.target.value})}
+                  style={{borderRadius:0, border:'none', borderTop:'1px solid var(--c-sub)', background:'var(--c-bg)'}}
+                />
+              )}
+            </div>
+
+            <div style={{display:'flex', gap:8}}>
+              <button className="btn-ghost" style={{fontSize:12, padding:'7px 14px'}} onClick={()=>loadDemo(idx)}>Load Demo</button>
+              <button className="btn-primary" style={{flex:1, fontSize:13}} onClick={()=>loadDeck(idx)} disabled={!player.deckRaw.trim() || st==='loading'}>
+                {st==='loading' ? <><div className="spinner" style={{width:14,height:14}}/> Loading…</> : 'Load Deck →'}
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+    );
+  }
+
+  function Step2({ count, players, upd, onNext, onBack }) {
+    const active   = players.slice(0,count);
+    const ready    = active.filter(p=>p.status==='loaded').length;
+    const canGo    = ready >= 2;
+
+    const loadDemo = (idx) => {
+      const prof = PROFILES[idx % PROFILES.length];
+      upd(idx, { status:'loading', profile:null });
+      setTimeout(()=> upd(idx, { status:'loaded', profile:prof, stats:prof.stats, colors:prof.colors, commander:prof.commander, name: players[idx].name || prof.dName }), 1200);
+    };
+
+    const loadDeck = (idx) => {
+      upd(idx, { status:'loading' });
+      setTimeout(()=>{
+        const stats = parseDeck(players[idx].deckRaw);
+        if(stats) upd(idx, { status:'loaded', stats, profile:null });
+        else upd(idx, { status:'empty' });
+      }, 1500);
+    };
+
+    const cols = count === 4 ? 2 : count;
+    return (
+      <div className="afu" style={{display:'flex', flexDirection:'column', gap:28}}>
+        <div style={{display:'flex', alignItems:'flex-end', justifyContent:'space-between', flexWrap:'wrap', gap:12}}>
+          <div>
+            <div className="kicker" style={{marginBottom:10}}>Step 2 of 3</div>
+            <h1 className="df" style={{fontSize:48, color:'var(--c-text)', marginBottom:8}}>Load the Lists</h1>
+            <p style={{color:'var(--c-text2)', fontSize:15}}>Paste each decklist or hit <em>Load Demo</em> to try sample decks.</p>
+          </div>
+          <div style={{display:'flex', alignItems:'center', gap:8}}>
+            <div style={{fontSize:13, color:'var(--c-text3)'}}>{ready}/{count} ready</div>
+            <div style={{width:80, height:5, borderRadius:99, background:'var(--c-sub)', overflow:'hidden'}}>
+              <div style={{height:'100%', width:`${(ready/count)*100}%`, background:'var(--c-green)', borderRadius:99, transition:'width .5s var(--ease)'}}/>
+            </div>
+          </div>
+        </div>
+
+        <div style={{display:'grid', gridTemplateColumns:`repeat(${cols}, 1fr)`, gap:14}}>
+          {active.map((p,i)=><PlayerSlot key={p.id} player={p} idx={i} upd={(i2,d)=>upd(i2,d)} loadDemo={loadDemo} loadDeck={loadDeck} />)}
+        </div>
+
+        <div style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
+          <button className="btn-ghost" onClick={onBack}>← Back</button>
+          <button className="btn-gold" onClick={onNext} disabled={!canGo}>
+            Review Pod <span style={{opacity:.7}}>→</span>
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Step 3 ───────────────────────────────────────────────────────────────
+  function Step3({ count, players, onLaunch, onBack }) {
+    const active = players.slice(0,count);
+    return (
+      <div className="afu" style={{display:'flex', flexDirection:'column', gap:28}}>
+        <div>
+          <div className="kicker" style={{marginBottom:10}}>Step 3 of 3</div>
+          <h1 className="df" style={{fontSize:48, color:'var(--c-text)', marginBottom:8}}>Review the Pod</h1>
+          <p style={{color:'var(--c-text2)', fontSize:15}}>Everything look right? Launch the match table to compare and analyze.</p>
+        </div>
+
+        <div style={{display:'grid', gridTemplateColumns:`repeat(${Math.min(count,2)}, 1fr)`, gap:14}}>
+          {active.map((p,i)=>{
+            const s = p.profile?.stats || p.stats;
+            const acc = ACCENTS[i];
+            return (
+              <div key={p.id} className="card" style={{padding:20, borderColor:`${acc.c}44`}}>
+                <div style={{display:'flex', gap:14, alignItems:'flex-start', marginBottom:14}}>
+                  <div style={{width:52, height:52, borderRadius:10, background:'repeating-linear-gradient(45deg, var(--c-sub) 0, var(--c-sub) 2px, transparent 2px, transparent 10px)', border:'1px solid var(--c-border)', flexShrink:0}} />
+                  <div>
+                    <div style={{fontSize:16, fontWeight:600, marginBottom:4}}>{p.name}</div>
+                    <ColorPips colors={p.colors} size={18} />
+                    {p.commander && <div style={{fontSize:12, color:'var(--c-gold)', fontStyle:'italic', fontFamily:"'Cormorant Garamond',serif", marginTop:5}}>{p.commander}</div>}
+                  </div>
+                </div>
+                {s && (
+                  <div style={{display:'flex', gap:8}}>
+                    {[['Cards',s.total],['Lands',s.lands],['Avg CMC',s.avgCmc]].map(([l,v])=>(
+                      <div key={l} style={{flex:1, background:'var(--c-bg)', border:'1px solid var(--c-sub)', borderRadius:10, padding:'7px 10px', textAlign:'center'}}>
+                        <div style={{fontSize:9, fontWeight:700, letterSpacing:'.18em', textTransform:'uppercase', color:'var(--c-text3)', marginBottom:4}}>{l}</div>
+                        <div style={{fontSize:16, fontWeight:600}}>{v}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        <div style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
+          <button className="btn-ghost" onClick={onBack}>← Back</button>
+          <button className="btn-gold" onClick={onLaunch} style={{padding:'14px 36px', fontSize:16}}>
+            Launch Match →
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Setup Wizard ─────────────────────────────────────────────────────────
+  function StepDots({ current, total }) {
+    return (
+      <div style={{display:'flex', gap:6, alignItems:'center'}}>
+        {Array.from({length:total},(_,i)=>(
+          <div key={i} style={{
+            height:7, borderRadius:99,
+            width: i===current-1 ? 24 : 7,
+            background: i<current ? (i===current-1?'var(--c-gold)':'var(--c-gold-dim)') : 'var(--c-sub)',
+            transition:'all .3s var(--ease)',
+          }}/>
+        ))}
+      </div>
+    );
+  }
+
+  function SetupWizard({ count, setCount, players, upd, onLaunch }) {
+    const [step, setStep] = useState(1);
+    return (
+      <div style={{minHeight:'100vh', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', padding:'32px 20px'}}>
+        <div style={{width:'100%', maxWidth:700}}>
+          <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:36}}>
+            <div style={{display:'flex', alignItems:'center', gap:10}}>
+              <div style={{width:28, height:28, borderRadius:6, background:'var(--c-green)', display:'flex',alignItems:'center',justifyContent:'center', fontSize:14}}>⚖</div>
+              <span style={{fontWeight:700, fontSize:15, letterSpacing:'.02em'}}>Deck Balancer</span>
+            </div>
+            <StepDots current={step} total={3} />
+          </div>
+
+          <div key={step}>
+            {step===1 && <Step1 count={count} setCount={setCount} players={players} upd={upd} onNext={()=>setStep(2)} />}
+            {step===2 && <Step2 count={count} players={players} upd={upd} onNext={()=>setStep(3)} onBack={()=>setStep(1)} />}
+            {step===3 && <Step3 count={count} players={players} onLaunch={onLaunch} onBack={()=>setStep(2)} />}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Commander Placeholder ────────────────────────────────────────────────
+  function CommanderArt({ commander, accent }) {
+    return (
+      <div style={{
+        height:110, borderRadius:10, overflow:'hidden', position:'relative',
+        background:`repeating-linear-gradient(135deg, ${accent}18 0, ${accent}18 2px, transparent 2px, transparent 14px)`,
+        border:`1px solid ${accent}33`, marginBottom:14,
+        display:'flex', alignItems:'center', justifyContent:'center',
+      }}>
+        <div style={{position:'absolute', inset:0, background:`linear-gradient(180deg, transparent 40%, var(--c-surface) 100%)`}}/>
+        {commander ? (
+          <div style={{position:'relative', textAlign:'center', padding:'0 12px'}}>
+            <div style={{fontSize:11, fontWeight:700, letterSpacing:'.16em', textTransform:'uppercase', color:`${accent}`, marginBottom:3, opacity:.7}}>Commander</div>
+            <div style={{fontFamily:"'Cormorant Garamond',serif", fontStyle:'italic', fontSize:15, fontWeight:600, color:'var(--c-text)', lineHeight:1.3}}>{commander}</div>
+          </div>
+        ) : (
+          <div style={{position:'relative', fontSize:11, color:'var(--c-text3)', letterSpacing:'.14em', textTransform:'uppercase'}}>No commander set</div>
+        )}
+      </div>
+    );
+  }
+
+  // ── Card Section ─────────────────────────────────────────────────────────
+  function CardSection({ group }) {
+    const [open, setOpen] = useState(false);
+    return (
+      <div style={{borderRadius:10, border:'1px solid var(--c-sub)', overflow:'hidden', marginBottom:6}}>
+        <button onClick={()=>setOpen(!open)} style={{
+          width:'100%', padding:'8px 12px', background:'var(--c-bg)',
+          display:'flex', alignItems:'center', justifyContent:'space-between',
+          color:'var(--c-text2)', fontSize:12, fontWeight:500,
+        }}>
+          <span>{group.l}</span>
+          <div style={{display:'flex',alignItems:'center',gap:8}}>
+            <span style={{fontFamily:'monospace', fontSize:11, color:'var(--c-text3)'}}>{group.n}</span>
+            <span style={{fontSize:9, opacity:.5}}>{open?'▲':'▼'}</span>
+          </div>
+        </button>
+        {open && (
+          <div style={{padding:'6px 12px 10px', background:'var(--c-surface)', display:'flex', flexDirection:'column', gap:3}}>
+            {group.cards.map((name,i)=>(
+              <div key={i} style={{fontSize:12, color:'var(--c-text2)', padding:'2px 0', borderBottom:'1px solid var(--c-sub)', lineHeight:1.4, display:'flex', alignItems:'center', gap:6}}>
+                <span style={{fontSize:10, color:'var(--c-text3)', fontFamily:'monospace', minWidth:14}}>1</span>
+                {name}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // ── Player Card (Match View) ─────────────────────────────────────────────
+  function PlayerCard({ player, idx }) {
+    const acc = ACCENTS[idx];
+    const s   = player.profile?.stats || player.stats;
+    const grp = player.profile?.groups || [];
+    return (
+      <div className="card" style={{
+        display:'flex', flexDirection:'column',
+        borderTop:`2px solid ${acc.c}88`,
+        overflow:'hidden',
+      }}>
+        <div style={{padding:'16px 18px', borderBottom:'1px solid var(--c-sub)'}}>
+          <div style={{display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:12}}>
+            <div>
+              <div style={{fontSize:10, fontWeight:700, letterSpacing:'.22em', textTransform:'uppercase', color:acc.c, marginBottom:5}}>Seat {idx+1}</div>
+              <div style={{fontSize:22, fontWeight:700, letterSpacing:'-.01em', lineHeight:1}}>{player.name}</div>
+            </div>
+            {s && <div style={{textAlign:'right'}}>
+              <div style={{fontSize:9, fontWeight:700, letterSpacing:'.18em', textTransform:'uppercase', color:'var(--c-text3)', marginBottom:4}}>Deck Size</div>
+              <div style={{fontFamily:'monospace', fontSize:22, color:'var(--c-text)'}}>{s.total}</div>
+            </div>}
+          </div>
+          <CommanderArt commander={player.commander} accent={acc.c} />
+          <div style={{marginBottom:10}}><ColorPips colors={player.colors} size={22} /></div>
+          {s && (
+            <>
+              <div style={{display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:6, marginBottom:12}}>
+                {[['Lands',s.lands],['Spells',s.spells],['Avg CMC',s.avgCmc]].map(([l,v])=>(
+                  <div key={l} style={{background:'var(--c-bg)', border:'1px solid var(--c-sub)', borderRadius:9, padding:'7px 8px', textAlign:'center'}}>
+                    <div style={{fontSize:9, fontWeight:700, letterSpacing:'.16em', textTransform:'uppercase', color:'var(--c-text3)', marginBottom:3}}>{l}</div>
+                    <div style={{fontSize:15, fontWeight:600}}>{v}</div>
+                  </div>
+                ))}
+              </div>
+              <div>
+                <div style={{fontSize:10, fontWeight:700, letterSpacing:'.18em', textTransform:'uppercase', color:'var(--c-text3)', marginBottom:6}}>Mana Curve</div>
+                <ManaCurve curve={s.curve} compact={true} />
+              </div>
+            </>
+          )}
+        </div>
+        <div style={{padding:'12px 18px', flex:1, overflowY:'auto', maxHeight:240}}>
+          <div style={{fontSize:10, fontWeight:700, letterSpacing:'.18em', textTransform:'uppercase', color:'var(--c-text3)', marginBottom:8}}>Card Library</div>
+          {grp.length > 0 ? grp.map(g=><CardSection key={g.l} group={g} />) : (
+            s?.cards?.slice(0,30).map((c,i)=>(
+              <div key={i} style={{fontSize:12, padding:'3px 0', color:'var(--c-text2)', borderBottom:'1px solid var(--c-sub)', display:'flex', gap:8}}>
+                <span style={{fontFamily:'monospace', fontSize:11, color:'var(--c-text3)', minWidth:20}}>{c.qty}x</span>
+                <span>{c.name}</span>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // ── Analysis Section ─────────────────────────────────────────────────────
+  function ScoreCard({ player, idx, animate }) {
+    const sc  = player.profile?.analysis?.score || Math.floor(55+Math.random()*30);
+    const lbl = player.profile?.analysis?.label || 'Balanced';
+    const sum = player.profile?.analysis?.summary || '';
+    const color = sc>=75 ? 'oklch(62% .20 20)' : sc>=60 ? 'var(--c-green)' : 'var(--c-gold)';
+    return (
+      <div style={{
+        padding:'16px 20px', background:'var(--c-bg)', border:'1px solid var(--c-sub)', borderRadius:'var(--rad)',
+        display:'flex', gap:16, alignItems:'flex-start',
+        animation: animate ? `fadeUp 350ms ${idx*120}ms var(--ease) both` : 'none',
+      }}>
+        <div style={{minWidth:56}}>
+          <div style={{fontSize:40, fontWeight:700, lineHeight:1, color, fontFamily:'monospace'}}>
+            {animate ? <CountUp to={sc} duration={1200} /> : sc}
+          </div>
+          <div style={{fontSize:9, fontWeight:700, letterSpacing:'.15em', textTransform:'uppercase', color:'var(--c-text3)', marginTop:2}}>/ 100</div>
+        </div>
+        <div style={{flex:1}}>
+          <div style={{display:'flex', alignItems:'center', gap:8, marginBottom:6}}>
+            <span style={{fontWeight:600, fontSize:14}}>{player.name}</span>
+            <span style={{
+              display:'inline-block', padding:'2px 8px', borderRadius:99, fontSize:10, fontWeight:700, letterSpacing:'.06em',
+              background: sc>=75?'oklch(18% .08 20/.2)':sc>=60?'var(--c-green-bg)':'var(--c-gold-bg)',
+              border: `1px solid ${sc>=75?'oklch(62% .20 20/.3)':sc>=60?'oklch(57% .205 162/.3)':'oklch(73% .17 82/.3)'}`,
+              color: sc>=75?'oklch(68% .18 20)':sc>=60?'var(--c-green-hi)':'var(--c-gold)',
+            }}>{lbl}</span>
+          </div>
+          <ScoreBar score={sc} animate={animate} />
+          {sum && <p style={{marginTop:7, fontSize:12, color:'var(--c-text3)', lineHeight:1.5}}>{sum}</p>}
+        </div>
+      </div>
+    );
+  }
+
+  function AnalysisSection({ players }) {
+    const [status, setStatus] = useState('idle');
+    const [msgIdx, setMsgIdx] = useState(0);
+    const [done,   setDone]   = useState(false);
+
+    const analyze = () => {
+      setStatus('loading'); setDone(false);
+      let i=0;
+      const interval = setInterval(()=>{ i++; setMsgIdx(i%LOADING_MSGS.length); },600);
+      setTimeout(()=>{ clearInterval(interval); setStatus('done'); setDone(true); }, 2800);
+    };
+
+    const scores   = [...players].sort((a,b)=>(b.profile?.analysis?.score||0)-(a.profile?.analysis?.score||0));
+    const allScores = players.map(p=>p.profile?.analysis?.score||60);
+    const spread   = Math.max(...allScores)-Math.min(...allScores);
+    const verdict  = spread<=10 ? `Pod looks well-matched — only a ${spread}-point spread.`
+                   : spread<=22 ? `${scores[0]?.name} has a meaningful edge. The spread is ${spread} points.`
+                   :              `${scores[0]?.name}'s deck significantly outpaces the table — ${spread}-point spread.`;
+
+    return (
+      <div className="panel" style={{padding:'28px 32px', marginTop:24}}>
+        <div style={{display:'flex', alignItems:'flex-end', justifyContent:'space-between', marginBottom:24, flexWrap:'wrap', gap:12}}>
+          <div>
+            <div className="kicker" style={{marginBottom:8}}>Balance Analysis</div>
+            <h2 className="df" style={{fontSize:36, color:'var(--c-text)'}}>Oracle Verdict</h2>
+          </div>
+          <button className="btn-primary" onClick={analyze} disabled={status==='loading'} style={{
+            animation: status==='idle' ? 'glow 2s ease infinite' : 'none',
+          }}>
+            {status==='loading' ? <><div className="spinner" style={{width:14,height:14}}/> Analyzing…</> : status==='done' ? 'Re-run Analysis' : 'Analyze Balance →'}
+          </button>
+        </div>
+
+        {status==='idle' && (
+          <div style={{border:'1px dashed var(--c-sub)', borderRadius:'var(--rad-lg)', padding:'32px 24px', textAlign:'center', color:'var(--c-text3)'}}>
+            <div style={{fontSize:28, marginBottom:8, opacity:.4}}>⚖</div>
+            <div style={{fontSize:14, fontWeight:500}}>Run the analysis once the pod looks right.</div>
+            <div style={{display:'flex', gap:8, justifyContent:'center', marginTop:14, flexWrap:'wrap'}}>
+              {['Power compression','Mana velocity','Threat density','Synergy ceiling'].map(t=>(
+                <span key={t} className="badge-muted">{t}</span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {status==='loading' && (
+          <div style={{padding:'40px 24px', textAlign:'center'}}>
+            <div style={{position:'relative', display:'inline-block', marginBottom:20}}>
+              <div style={{position:'absolute', inset:0, borderRadius:'50%', background:'var(--c-green-bg)', animation:'pulse 1.5s ease infinite'}}/>
+              <div style={{position:'relative', width:56, height:56, borderRadius:'50%', background:'var(--c-green-bg)', border:'1px solid oklch(57% .205 162 / .3)', display:'flex', alignItems:'center', justifyContent:'center'}}>
+                <div style={{width:24, height:24, border:'2px solid var(--c-sub)', borderTopColor:'var(--c-green)', borderRadius:'50%', animation:'spin .75s linear infinite'}}/>
+              </div>
+            </div>
+            <div className="df" style={{fontSize:28, color:'var(--c-text)', marginBottom:6}}>Consulting the Oracle…</div>
+            <div style={{fontSize:13, color:'var(--c-text3)', animation:'pulse 1s ease infinite'}}>{LOADING_MSGS[msgIdx]}</div>
+          </div>
+        )}
+
+        {status==='done' && (
+          <div className="afu" style={{display:'flex', flexDirection:'column', gap:18}}>
+            <div style={{
+              padding:'16px 22px', borderRadius:'var(--rad-lg)',
+              background: spread>22 ? 'oklch(18% .08 20/.18)' : spread>10 ? 'var(--c-gold-bg)' : 'var(--c-green-bg)',
+              border: `1px solid ${spread>22?'oklch(62% .20 20/.3)':spread>10?'oklch(73% .17 82/.3)':'oklch(57% .205 162/.3)'}`,
+              display:'flex', alignItems:'center', gap:12,
+            }}>
+              <span style={{fontSize:20}}>{spread>22?'⚠':'⚖'}</span>
+              <span style={{fontWeight:500, fontSize:15, color:'var(--c-text)'}}>{verdict}</span>
+            </div>
+
+            <div style={{display:'grid', gridTemplateColumns:`${players.length <= 2 ? '240px ' : ''}1fr`, gap:20, alignItems:'start'}}>
+              {players.length <= 2 && (
+                <div style={{display:'flex', flexDirection:'column', alignItems:'center', gap:8, paddingTop:8}}>
+                  <RadarChart players={players.map(p=>({name:p.name, dimensions:p.profile?.analysis?.dimensions}))} size={220} />
+                  <div style={{display:'flex', gap:12, flexWrap:'wrap', justifyContent:'center'}}>
+                    {players.map((p,i)=>(
+                      <div key={i} style={{display:'flex', alignItems:'center', gap:5, fontSize:11, color:'var(--c-text2)'}}>
+                        <div style={{width:8, height:8, borderRadius:'50%', background:['oklch(65% .22 162)','oklch(72% .17 82)'][i]}}/>
+                        {p.name}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              <div style={{display:'flex', flexDirection:'column', gap:10}}>
+                {scores.map((p,i)=><ScoreCard key={p.id} player={p} idx={i} animate={done} />)}
+              </div>
+            </div>
+
+            {players.length > 2 && (
+              <div style={{display:'flex', flexDirection:'column', alignItems:'center', gap:8, paddingTop:4}}>
+                <RadarChart players={scores.map(p=>({name:p.name, dimensions:p.profile?.analysis?.dimensions}))} size={260} />
+                <div style={{display:'flex', gap:14, flexWrap:'wrap', justifyContent:'center'}}>
+                  {scores.map((p,i)=>(
+                    <div key={i} style={{display:'flex', alignItems:'center', gap:5, fontSize:11, color:'var(--c-text2)'}}>
+                      <div style={{width:8, height:8, borderRadius:'50%', background:['oklch(65% .22 162)','oklch(72% .17 82)','oklch(62% .18 220)','oklch(62% .20 20)'][i]}}/>
+                      {p.name}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div style={{background:'var(--c-bg)', border:'1px solid var(--c-sub)', borderRadius:'var(--rad)', padding:'16px 20px'}}>
+              <div className="kicker" style={{marginBottom:10}}>Analysis</div>
+              <p style={{fontSize:13, color:'var(--c-text2)', lineHeight:1.75}}>
+                The analysis found a meaningful power gap in this pod. The strongest deck carries consistent late-game inevitability and redundant engines that are difficult to contain. Mid-tier decks can steal games through efficient sequences or explosive burst turns, but lack the depth to go long. Consider applying bracket guidelines before play.
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // ── Match View ───────────────────────────────────────────────────────────
+  function MatchNav({ players, onBack, onLookup, onHistory }) {
+    return (
+      <header style={{
+        height:58, background:'var(--c-surface)', borderBottom:'1px solid var(--c-sub)',
+        display:'flex', alignItems:'center', justifyContent:'space-between',
+        padding:'0 24px', position:'sticky', top:0, zIndex:50,
+      }}>
+        <div style={{display:'flex', alignItems:'center', gap:16}}>
+          <button className="btn-ghost" onClick={onBack} style={{padding:'7px 12px', fontSize:13}}>← Setup</button>
+          <div style={{width:1, height:20, background:'var(--c-sub)'}}/>
+          <div style={{display:'flex', alignItems:'center', gap:8}}>
+            <div style={{width:22, height:22, borderRadius:5, background:'var(--c-green)', display:'flex',alignItems:'center',justifyContent:'center', fontSize:11}}>⚖</div>
+            <span style={{fontWeight:600, fontSize:14}}>Deck Balancer</span>
+          </div>
+          <span className="badge-muted" style={{fontSize:10}}>{players.length} players</span>
+        </div>
+        <div style={{display:'flex', gap:8}}>
+          <button className="btn-ghost" style={{fontSize:12, padding:'7px 12px'}} onClick={onLookup}>🔍 Card Lookup</button>
+          <button className="btn-ghost" style={{fontSize:12, padding:'7px 12px'}} onClick={onHistory}>📋 History</button>
+        </div>
+      </header>
+    );
+  }
+
+  function MatchView({ players, onBack, onLookup, onHistory }) {
+    const cols = players.length <= 2 ? 2 : players.length === 3 ? 3 : 2;
+    return (
+      <div className="afu">
+        <MatchNav players={players} onBack={onBack} onLookup={onLookup} onHistory={onHistory} />
+        <div style={{maxWidth:1360, margin:'0 auto', padding:'24px 24px 48px'}}>
+          <div style={{marginBottom:20}}>
+            <div className="kicker" style={{marginBottom:6}}>Game Table</div>
+            <h1 className="df" style={{fontSize:40, color:'var(--c-text)'}}>Match Table</h1>
+          </div>
+          <div style={{display:'grid', gridTemplateColumns:`repeat(${cols}, 1fr)`, gap:16, marginBottom:8}}>
+            {players.map((p,i)=><PlayerCard key={p.id} player={p} idx={i} />)}
+          </div>
+          <AnalysisSection players={players} />
+        </div>
+      </div>
+    );
+  }
+
+  // ── Card Lookup Modal ────────────────────────────────────────────────────
+  const MOCK_CARDS = { 'sol ring':{name:'Sol Ring',type:'Artifact',cost:'{1}',text:'Tap: Add two mana of any one color.'}, 'atraxa':{name:"Atraxa, Praetors' Voice",type:'Legendary Creature — Phyrexian Angel Horror',cost:'{G}{W}{U}{B}',text:'Flying, vigilance, deathtouch, lifelink. At the beginning of your end step, proliferate.'}, 'command tower':{name:'Command Tower',type:'Land',cost:'',text:"Tap: Add one mana of any color in your commander's color identity."} };
+  function CardLookupModal({ onClose }) {
+    const [q, setQ]   = useState('');
+    const [st, setSt] = useState('idle');
+    const [res, setRes] = useState(null);
+    const lookup = () => {
+      if(!q.trim()) return;
+      setSt('loading'); setRes(null);
+      setTimeout(()=>{
+        const found = MOCK_CARDS[q.toLowerCase().trim()] || MOCK_CARDS[Object.keys(MOCK_CARDS).find(k=>k.includes(q.toLowerCase().split(' ')[0]))||''];
+        setRes(found || { name: q, type:'Unknown', cost:'', text:'Card not found in local lookup. Will resolve via Scryfall in production.' });
+        setSt('done');
+      }, 800);
+    };
+    return (
+      <div className="modal-bg" onClick={onClose}>
+        <div className="modal" onClick={e=>e.stopPropagation()}>
+          <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:20}}>
+            <h2 style={{fontSize:20, fontWeight:700}}>Card Lookup</h2>
+            <button className="btn-icon" onClick={onClose}>✕</button>
+          </div>
+          <div style={{display:'flex', gap:8, marginBottom:16}}>
+            <input placeholder="Search card name…" value={q} onChange={e=>setQ(e.target.value)} onKeyDown={e=>e.key==='Enter'&&lookup()} style={{flex:1}}/>
+            <button className="btn-primary" onClick={lookup} disabled={!q.trim()||st==='loading'}>
+              {st==='loading' ? <div className="spinner" style={{width:14,height:14}}/> : '→'}
+            </button>
+          </div>
+          {res && (
+            <div className="afu" style={{background:'var(--c-bg)', border:'1px solid var(--c-sub)', borderRadius:'var(--rad)', padding:16}}>
+              <div style={{fontWeight:600, fontSize:15, marginBottom:4}}>{res.name}</div>
+              <div style={{fontSize:12, color:'var(--c-text3)', marginBottom:4}}>{res.type}</div>
+              {res.cost && <div style={{fontFamily:'monospace', fontSize:12, color:'var(--c-gold)', marginBottom:8}}>{res.cost}</div>}
+              <p style={{fontSize:13, color:'var(--c-text2)', lineHeight:1.6}}>{res.text}</p>
+            </div>
+          )}
+          <p style={{fontSize:11, color:'var(--c-text3)', marginTop:12}}>In production, this queries the Scryfall API for real-time card data.</p>
+        </div>
+      </div>
+    );
+  }
+
+  // ── History Panel ────────────────────────────────────────────────────────
+  function HistoryPanel({ onClose }) {
+    return (
+      <>
+        <div className="modal-bg" style={{justifyContent:'flex-end',alignItems:'stretch',background:'oklch(0% 0 0 / .4)'}} onClick={onClose}/>
+        <div className="side-panel">
+          <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:22}}>
+            <div>
+              <div className="kicker" style={{marginBottom:5}}>Session Log</div>
+              <h2 style={{fontSize:18, fontWeight:700}}>Match History</h2>
+            </div>
+            <button className="btn-icon" style={{flexShrink:0}} onClick={onClose}>✕</button>
+          </div>
+          <div style={{display:'flex', flexDirection:'column', gap:12}}>
+            {HISTORY.map(h=>(
+              <div key={h.id} style={{padding:14, background:'var(--c-bg)', border:'1px solid var(--c-sub)', borderRadius:'var(--rad)'}}>
+                <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:8}}>
+                  <span style={{fontSize:13, fontWeight:600}}>{h.date}</span>
+                  <span style={{fontSize:11, color:'var(--c-text3)'}}>{h.label}</span>
+                </div>
+                <div style={{display:'flex', flexDirection:'column', gap:3, marginBottom:8}}>
+                  {h.players.map((p,i)=>(
+                    <div key={i} style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
+                      <span style={{fontSize:12, color: p===h.top?'var(--c-gold)':'var(--c-text2)'}}>{p}</span>
+                      <span style={{fontFamily:'monospace', fontSize:11, color:'var(--c-text3)'}}>{h.scores[i]}</span>
+                    </div>
+                  ))}
+                </div>
+                <div style={{display:'flex', justifyContent:'space-between', alignItems:'center'}}>
+                  <span style={{fontSize:11, color:'var(--c-text3)'}}>Spread: {h.spread} pts</span>
+                  <span className={h.spread>22?'badge-red':h.spread>10?'badge-gold':'badge-green'} style={{fontSize:10}}>
+                    {h.spread>22?'Unbalanced':h.spread>10?'Slight edge':'Balanced'}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  // ── App Root ─────────────────────────────────────────────────────────────
+  const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+    "theme": "forest",
+    "compact": false
+  }/*EDITMODE-END*/;
+
+  function App() {
+    const [tweaks, setTweak] = useTweaks(TWEAK_DEFAULTS);
+    const [phase,   setPhase]   = useState('setup');
+    const [count,   setCount]   = useState(2);
+    const [players, setPlayers] = useState(Array.from({length:4},(_,i)=>mkPlayer(i+1)));
+    const [lookup,  setLookup]  = useState(false);
+    const [history, setHistory] = useState(false);
+    const [fading,  setFading]  = useState(false);
+
+    useEffect(()=>{ document.body.className = `theme-${tweaks.theme}`; }, [tweaks.theme]);
+
+    const upd = (idx, patch) => setPlayers(ps => ps.map((p,i)=>i===idx?{...p,...patch}:p));
+
+    const launch = () => {
+      setFading(true);
+      setTimeout(()=>{ setPhase('match'); setFading(false); }, 280);
+    };
+    const back = () => {
+      setFading(true);
+      setTimeout(()=>{ setPhase('setup'); setFading(false); }, 280);
+    };
+
+    const activePlayers = players.slice(0,count).filter(p=>p.status==='loaded');
+
+    return (
+      <div style={{ opacity:fading?0:1, transform:fading?'translateY(-6px)':'none', transition:'all 280ms ease' }}>
+        {phase==='setup'
+          ? <SetupWizard count={count} setCount={setCount} players={players} upd={upd} onLaunch={launch} />
+          : <MatchView players={activePlayers.length>=2?activePlayers:players.slice(0,count)} onBack={back} onLookup={()=>setLookup(true)} onHistory={()=>setHistory(true)} />
+        }
+        {lookup  && <CardLookupModal onClose={()=>setLookup(false)}  />}
+        {history && <HistoryPanel    onClose={()=>setHistory(false)} />}
+
+        <TweaksPanel tweaks={tweaks} setTweak={setTweak} onClose={()=>window.parent.postMessage({type:'__edit_mode_dismissed'},'*')}>
+          <TweakSection label="Theme">
+            <TweakRadio id="theme" label="Color theme" options={['forest','obsidian']} value={tweaks.theme} onChange={v=>setTweak('theme',v)} />
+          </TweakSection>
+          <TweakSection label="Defaults">
+            <TweakSlider id="playerCount" label="Default player count" min={2} max={4} step={1} value={count} onChange={v=>setCount(v)} />
+          </TweakSection>
+        </TweaksPanel>
+      </div>
+    );
+  }
+
+  ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+  <template id="__bundler_thumbnail">
+    <svg viewBox="0 0 200 140" xmlns="http://www.w3.org/2000/svg">
+      <rect width="200" height="140" fill="#0a1510"/>
+      <rect x="30" y="25" width="65" height="90" rx="8" fill="#152214" stroke="#2a4a32" stroke-width="1"/>
+      <rect x="105" y="25" width="65" height="90" rx="8" fill="#152214" stroke="#2a4a32" stroke-width="1"/>
+      <rect x="30" y="25" width="65" height="18" rx="8" fill="#1a6b3a" opacity=".7"/>
+      <rect x="105" y="25" width="65" height="18" rx="8" fill="#c4a84a" opacity=".5"/>
+      <rect x="38" y="52" width="49" height="5" rx="2" fill="#1a6b3a" opacity=".5"/>
+      <rect x="38" y="62" width="35" height="5" rx="2" fill="#1a6b3a" opacity=".3"/>
+      <rect x="38" y="72" width="42" height="5" rx="2" fill="#1a6b3a" opacity=".3"/>
+      <rect x="113" y="52" width="49" height="5" rx="2" fill="#c4a84a" opacity=".4"/>
+      <rect x="113" y="62" width="35" height="5" rx="2" fill="#c4a84a" opacity=".25"/>
+      <text x="100" y="130" text-anchor="middle" fill="#1a6b3a" font-size="9" font-family="sans-serif" opacity=".8">MTG Deck Balancer</text>
+    </svg>
+  </template>
+</body>
+</html>

@@ -11,6 +11,8 @@ export interface DeckParseError {
 export interface Player {
   seat: PlayerSeat
   name: string
+  commander: string
+  colors: string[]
   deckRaw: string
   cards: DeckCard[]
   parseErrors: DeckParseError[]

@@ -6,8 +6,9 @@ export interface ScryfallCard {
   type_line: string
   colors: string[]
   color_identity: string[]
-  image_uris?: { small: string; normal: string; large: string }
-  card_faces?: Array<{ image_uris?: { small: string; normal: string; large: string } }>
+  image_uris?: { small: string; normal: string; large: string; art_crop: string }
+  oracle_text?: string
+  card_faces?: Array<{ image_uris?: { small: string; normal: string; large: string; art_crop: string }; oracle_text?: string }>
   prices: { usd: string | null; eur: string | null; tix: string | null }
   legalities: Record<string, string>
 }
