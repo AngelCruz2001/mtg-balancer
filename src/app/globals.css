@@ -4,56 +4,179 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-    --radius: 0.5rem;
-  }
-
-  .dark {
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+    --radius: 0.875rem;
   }
 }
 
-@layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
+:root {
+  --c-bg:       oklch(7.5% 0.018 165);
+  --c-surface:  oklch(11.5% 0.022 162);
+  --c-raised:   oklch(15% 0.025 160);
+  --c-border:   oklch(22% 0.028 158);
+  --c-sub:      oklch(17% 0.02 160);
+  --c-green:    oklch(57% 0.205 162);
+  --c-green-hi: oklch(66% 0.22 162);
+  --c-green-bg: oklch(25% 0.08 162 / 0.22);
+  --c-gold:     oklch(73% 0.17 82);
+  --c-gold-dim: oklch(56% 0.13 82);
+  --c-gold-bg:  oklch(22% 0.08 82 / 0.2);
+  --c-text:     oklch(93% 0.01 160);
+  --c-text2:    oklch(68% 0.022 160);
+  --c-text3:    oklch(46% 0.015 160);
+  --c-red:      oklch(60% 0.22 20);
+  --rad: 14px;
+  --rad-lg: 20px;
+  --rad-xl: 28px;
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur: 220ms;
 }
+
+body.theme-obsidian {
+  --c-bg:       oklch(6% 0.012 270);
+  --c-surface:  oklch(9.5% 0.016 268);
+  --c-raised:   oklch(13% 0.02 266);
+  --c-border:   oklch(20% 0.022 265);
+  --c-sub:      oklch(15% 0.016 268);
+  --c-green:    oklch(60% 0.18 200);
+  --c-green-hi: oklch(68% 0.20 200);
+  --c-green-bg: oklch(22% 0.07 200 / 0.2);
+  --c-gold:     oklch(70% 0.14 50);
+  --c-gold-dim: oklch(52% 0.10 50);
+  --c-gold-bg:  oklch(18% 0.07 50 / 0.18);
+}
+
+html { color-scheme: dark; }
+
+body {
+  background: var(--c-bg);
+  background-image:
+    radial-gradient(ellipse 70% 32% at 50% -2%, oklch(28% 0.10 162 / 0.16), transparent),
+    radial-gradient(circle at 90% 6%, oklch(22% 0.10 82 / 0.10), transparent 24%);
+  background-attachment: fixed;
+  color: var(--c-text);
+  font-family: var(--font-outfit), 'Outfit', sans-serif;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+body.theme-obsidian {
+  background-image:
+    radial-gradient(ellipse 70% 32% at 50% -2%, oklch(22% 0.09 220 / 0.14), transparent),
+    radial-gradient(circle at 90% 6%, oklch(18% 0.08 50 / 0.08), transparent 24%);
+}
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-thumb { background: var(--c-border); border-radius: 99px; }
+::-webkit-scrollbar-track { background: transparent; }
+
+@keyframes fadeUp   { from { opacity:0; transform:translateY(10px) } to { opacity:1; transform:none } }
+@keyframes fadeIn   { from { opacity:0 } to { opacity:1 } }
+@keyframes slideR   { from { opacity:0; transform:translateX(18px) } to { opacity:1; transform:none } }
+@keyframes slideL   { from { opacity:0; transform:translateX(-18px) } to { opacity:1; transform:none } }
+@keyframes mtg-spin   { to { transform: rotate(360deg) } }
+@keyframes mtg-pulse  { 0%,100%{opacity:1} 50%{opacity:.3} }
+@keyframes mtg-glow   { 0%,100%{box-shadow:0 0 0 0 var(--c-green-bg)} 50%{box-shadow:0 0 28px 6px var(--c-green-bg)} }
+
+.afu { animation: fadeUp 280ms var(--ease) both }
+.afi { animation: fadeIn 200ms ease both }
+.asr { animation: slideR 280ms var(--ease) both }
+.asl { animation: slideL 280ms var(--ease) both }
+
+.btn-primary {
+  background: var(--c-green); color: oklch(10% 0.025 162);
+  padding: 11px 22px; border-radius: var(--rad);
+  font-size: 14px; font-weight: 600; letter-spacing: .01em;
+  display: inline-flex; align-items: center; gap: 8px;
+  box-shadow: 0 4px 16px -4px oklch(57% .205 162 / .45);
+  border: none; cursor: pointer; font-family: inherit;
+  transition: all var(--dur) var(--ease);
+}
+.btn-primary:hover:not(:disabled) {
+  background: var(--c-green-hi); transform: translateY(-1px);
+  box-shadow: 0 8px 24px -6px oklch(57% .205 162 / .55);
+}
+.btn-primary:disabled { opacity: .38; pointer-events: none; }
+
+.btn-gold {
+  background: var(--c-gold); color: oklch(15% 0.05 82);
+  padding: 13px 30px; border-radius: var(--rad-lg);
+  font-size: 15px; font-weight: 600; letter-spacing: .01em;
+  display: inline-flex; align-items: center; gap: 8px;
+  box-shadow: 0 4px 20px -6px oklch(73% .17 82 / .45);
+  border: none; cursor: pointer; font-family: inherit;
+  transition: all var(--dur) var(--ease);
+}
+.btn-gold:hover:not(:disabled) {
+  background: oklch(77% .18 82); transform: translateY(-1px);
+  box-shadow: 0 8px 28px -6px oklch(73% .17 82 / .55);
+}
+.btn-gold:disabled { opacity: .38; pointer-events: none; }
+
+.btn-ghost {
+  background: transparent; color: var(--c-text2);
+  padding: 8px 14px; border-radius: var(--rad);
+  font-size: 13px; font-weight: 500;
+  border: 1px solid var(--c-sub);
+  display: inline-flex; align-items: center; gap: 6px;
+  cursor: pointer; font-family: inherit;
+  transition: all var(--dur) var(--ease);
+}
+.btn-ghost:hover:not(:disabled) { background: var(--c-raised); color: var(--c-text); }
+.btn-ghost:disabled { opacity: .38; pointer-events: none; }
+
+.btn-icon {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--c-raised); border: 1px solid var(--c-sub);
+  color: var(--c-text2); display: flex; align-items: center; justify-content: center;
+  font-size: 15px; cursor: pointer; font-family: inherit;
+  transition: all var(--dur) var(--ease);
+}
+.btn-icon:hover { background: var(--c-border); color: var(--c-text); }
+
+.mtg-card  { background: var(--c-surface); border: 1px solid var(--c-sub);   border-radius: var(--rad-lg); }
+.mtg-panel { background: var(--c-raised);  border: 1px solid var(--c-border); border-radius: var(--rad-xl); }
+
+.badge-green { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:99px; font-size:11px; font-weight:600; letter-spacing:.04em; background:var(--c-green-bg); border:1px solid oklch(57% .205 162 / .28); color:var(--c-green-hi); }
+.badge-gold  { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:99px; font-size:11px; font-weight:600; letter-spacing:.04em; background:var(--c-gold-bg);  border:1px solid oklch(73% .17 82 / .28); color:var(--c-gold); }
+.badge-muted { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:99px; font-size:11px; font-weight:600; letter-spacing:.04em; background:oklch(18% .02 160); border:1px solid var(--c-sub); color:var(--c-text2); }
+.badge-red   { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:99px; font-size:11px; font-weight:600; letter-spacing:.04em; background:oklch(18% .08 20/.18); border:1px solid oklch(60% .22 20/.28); color:oklch(68% .18 20); }
+
+.kicker { font-size:10px; font-weight:700; letter-spacing:.25em; text-transform:uppercase; color:var(--c-gold); font-family: var(--font-outfit), 'Outfit', sans-serif; }
+.df     { font-family: var(--font-cormorant), 'Cormorant Garamond', serif; font-style:italic; letter-spacing:-.03em; line-height:1.05; }
+
+.mtg-input, .mtg-textarea {
+  box-sizing: border-box; width: 100%; background: var(--c-bg); border: 1px solid var(--c-sub);
+  color: var(--c-text); font-family: var(--font-outfit), 'Outfit', sans-serif; font-size: 14px;
+  border-radius: var(--rad); padding: 10px 14px; outline: none;
+  transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+.mtg-input:focus, .mtg-textarea:focus {
+  border-color: var(--c-green); box-shadow: 0 0 0 3px oklch(57% .205 162 / .12);
+}
+.mtg-input::placeholder, .mtg-textarea::placeholder { color: var(--c-text3); }
+.mtg-textarea { resize: none; line-height: 1.6; font-size: 12.5px; font-family: monospace; }
+
+.modal-bg {
+  position: fixed; inset: 0; background: oklch(0% 0 0 / .65); z-index: 90;
+  display: flex; align-items: center; justify-content: center; animation: fadeIn 200ms ease;
+}
+.modal {
+  background: var(--c-raised); border: 1px solid var(--c-border); border-radius: var(--rad-xl);
+  width: min(480px, 92vw); padding: 28px; animation: fadeUp 280ms var(--ease);
+}
+.side-panel {
+  position: fixed; top: 0; right: 0; bottom: 0; width: 300px;
+  background: var(--c-surface); border-left: 1px solid var(--c-border);
+  z-index: 100; padding: 24px; overflow-y: auto; animation: slideR 250ms var(--ease);
+}
+
+.spinner {
+  width: 20px; height: 20px; border: 2px solid var(--c-sub);
+  border-top-color: var(--c-green); border-radius: 50%;
+  animation: mtg-spin .75s linear infinite; flex-shrink: 0;
+}
+
+.btn-glow { animation: mtg-glow 2s ease infinite; }
