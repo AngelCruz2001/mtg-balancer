@@ -60,7 +60,7 @@ export default function DeckLoaderPanel() {
   const canStep3 = readyCount >= 2
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', padding: '48px 20px' }}>
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', padding: '48px 20px', overflowX: 'hidden' }}>
       <div style={{ width: '100%', maxWidth: 700 }}>
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 36 }}>
@@ -68,7 +68,7 @@ export default function DeckLoaderPanel() {
             <div style={{ width: 22, height: 22, borderRadius: 5, background: 'var(--c-green)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'oklch(10% 0.025 162)' }}><Scale size={13} /></div>
             <span style={{ fontWeight: 700, fontSize: 15, letterSpacing: '.02em' }}>Deck Balancer</span>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, minWidth: 0, overflow: 'hidden' }}>
             <StepDots current={step} total={3} />
             <button className="btn-ghost" style={{ fontSize: 12, padding: '5px 10px' }} onClick={() => router.push('/pod')}><Zap size={13} /> Pod</button>
             <button className="btn-ghost" style={{ fontSize: 12, padding: '5px 10px' }} onClick={() => router.push('/decks')}><Library size={13} /> Library</button>

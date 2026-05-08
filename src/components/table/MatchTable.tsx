@@ -21,7 +21,7 @@ export function MatchNav({
       display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       padding: '0 24px', position: 'sticky', top: 0, zIndex: 50,
     }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 16, minWidth: 0, overflow: 'hidden' }}>
         <button className="btn-ghost" onClick={onBack} style={{ padding: '7px 12px', fontSize: 13 }}>← Setup</button>
         <div style={{ width: 1, height: 20, background: 'var(--c-sub)' }} />
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>

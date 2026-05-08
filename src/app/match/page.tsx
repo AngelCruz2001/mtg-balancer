@@ -42,7 +42,7 @@ export default function MatchPage() {
   if (ready.length < 2) return null
 
   return (
-    <div className="afu">
+    <div className="afu" style={{ overflowX: 'hidden' }}>
       <MatchNav
         playerCount={ready.length}
         elapsed={elapsed}
