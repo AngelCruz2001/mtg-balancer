@@ -1,5 +1,6 @@
 import type { Player } from '@/types/deck'
 import PlayerZone from './PlayerZone'
+import { Scale, Timer, Search, History } from 'lucide-react'
 
 export function MatchNav({
   playerCount,
@@ -24,7 +25,7 @@ export function MatchNav({
         <button className="btn-ghost" onClick={onBack} style={{ padding: '7px 12px', fontSize: 13 }}>← Setup</button>
         <div style={{ width: 1, height: 20, background: 'var(--c-sub)' }} />
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <div style={{ width: 22, height: 22, borderRadius: 5, background: 'var(--c-green)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11 }}>⚖</div>
+          <div style={{ width: 22, height: 22, borderRadius: 5, background: 'var(--c-green)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'oklch(10% 0.025 162)' }}><Scale size={13} /></div>
           <span style={{ fontWeight: 600, fontSize: 14 }}>Deck Balancer</span>
         </div>
         <span className="badge-muted" style={{ fontSize: 10 }}>{playerCount} players</span>
@@ -32,10 +33,10 @@ export function MatchNav({
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <div style={{ padding: '5px 12px', borderRadius: 'var(--rad)', background: 'var(--c-bg)', border: '1px solid var(--c-sub)', fontSize: 13, fontWeight: 600, color: 'var(--c-text2)', fontVariantNumeric: 'tabular-nums', letterSpacing: '.02em' }}>
-          ⏱ {elapsed}
+          <Timer size={13} /> {elapsed}
         </div>
-        <button className="btn-ghost" style={{ fontSize: 12, padding: '7px 12px' }} onClick={onLookup}>🔍 Card Lookup</button>
-        <button className="btn-ghost" style={{ fontSize: 12, padding: '7px 12px' }} onClick={onHistory}>📋 History</button>
+        <button className="btn-ghost" style={{ fontSize: 12, padding: '7px 12px' }} onClick={onLookup}><Search size={13} /> Card Lookup</button>
+        <button className="btn-ghost" style={{ fontSize: 12, padding: '7px 12px' }} onClick={onHistory}><History size={13} /> History</button>
       </div>
     </header>
   )

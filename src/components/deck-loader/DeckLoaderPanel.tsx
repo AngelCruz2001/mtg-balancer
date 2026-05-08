@@ -5,6 +5,7 @@ import { useAppStore } from '@/store'
 import PlayerSlot from './PlayerSlot'
 import { PLAYER_ACCENTS } from '@/lib/design'
 import { UserMenu } from '@/components/ui/user-menu'
+import { Scale, Zap, Library, Trophy } from 'lucide-react'
 import type { PlayerSeat } from '@/types/deck'
 
 const SEAT_NAMES = ['Alex', 'Sam', 'Jamie', 'Morgan']
@@ -64,14 +65,14 @@ export default function DeckLoaderPanel() {
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 36 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ width: 22, height: 22, borderRadius: 5, background: 'var(--c-green)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11 }}>⚖</div>
+            <div style={{ width: 22, height: 22, borderRadius: 5, background: 'var(--c-green)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'oklch(10% 0.025 162)' }}><Scale size={13} /></div>
             <span style={{ fontWeight: 700, fontSize: 15, letterSpacing: '.02em' }}>Deck Balancer</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <StepDots current={step} total={3} />
-            <button className="btn-ghost" style={{ fontSize: 12, padding: '5px 10px' }} onClick={() => router.push('/pod')}>⚡ Pod</button>
-            <button className="btn-ghost" style={{ fontSize: 12, padding: '5px 10px' }} onClick={() => router.push('/decks')}>📚 Library</button>
-            <button className="btn-ghost" style={{ fontSize: 12, padding: '5px 10px' }} onClick={() => router.push('/leaderboard')}>🏆 Board</button>
+            <button className="btn-ghost" style={{ fontSize: 12, padding: '5px 10px' }} onClick={() => router.push('/pod')}><Zap size={13} /> Pod</button>
+            <button className="btn-ghost" style={{ fontSize: 12, padding: '5px 10px' }} onClick={() => router.push('/decks')}><Library size={13} /> Library</button>
+            <button className="btn-ghost" style={{ fontSize: 12, padding: '5px 10px' }} onClick={() => router.push('/leaderboard')}><Trophy size={13} /> Board</button>
             <UserMenu />
           </div>
         </div>

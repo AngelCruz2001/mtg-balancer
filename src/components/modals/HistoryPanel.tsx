@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import type { Match } from '@/types/match'
 import { PLAYER_ACCENTS } from '@/lib/design'
 import ReactMarkdown from 'react-markdown'
+import { Trophy, X, History } from 'lucide-react'
 
 function fmtDate(iso: string): string {
   return new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })
@@ -30,8 +31,8 @@ function MatchCard({ match }: { match: Match }) {
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 5, flexWrap: 'wrap' }}>
             <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--c-text)', whiteSpace: 'nowrap' }}>{fmtDate(match.played_at)}</span>
             {winner && (
-              <span style={{ padding: '2px 8px', borderRadius: 99, fontSize: 10, fontWeight: 700, letterSpacing: '.06em', background: 'var(--c-green-bg)', border: '1px solid oklch(57% .205 162/.3)', color: 'var(--c-green-hi)', whiteSpace: 'nowrap' }}>
-                🏆 {winner.player_name}
+              <span style={{ padding: '2px 8px', borderRadius: 99, fontSize: 10, fontWeight: 700, letterSpacing: '.06em', background: 'var(--c-green-bg)', border: '1px solid oklch(57% .205 162/.3)', color: 'var(--c-green-hi)', whiteSpace: 'nowrap', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                <Trophy size={10} /> {winner.player_name}
               </span>
             )}
             <span style={{ fontSize: 11, color: 'var(--c-text3)' }}>⏱ {fmtDuration(match.duration_seconds)}</span>
@@ -111,7 +112,7 @@ export default function HistoryPanel({ onClose }: { onClose: () => void }) {
             <div className="kicker" style={{ marginBottom: 5 }}>Session Log</div>
             <h2 style={{ fontSize: 18, fontWeight: 700 }}>Match History</h2>
           </div>
-          <button className="btn-icon" style={{ flexShrink: 0 }} onClick={onClose}>✕</button>
+          <button className="btn-icon" style={{ flexShrink: 0 }} onClick={onClose}><X size={14} /></button>
         </div>
 
         {loading && (
@@ -129,7 +130,7 @@ export default function HistoryPanel({ onClose }: { onClose: () => void }) {
 
         {!loading && !error && matches.length === 0 && (
           <div style={{ padding: '40px 0', textAlign: 'center' }}>
-            <div style={{ fontSize: 28, marginBottom: 8, opacity: .3 }}>📋</div>
+            <div style={{ marginBottom: 8, opacity: .3, display: 'flex', justifyContent: 'center' }}><History size={28} /></div>
             <div style={{ fontSize: 13, color: 'var(--c-text3)', lineHeight: 1.6 }}>
               No matches recorded yet.
               <br />Run an analysis and save the result.

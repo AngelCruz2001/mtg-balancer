@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import { ColorPips } from '@/components/ui/color-pips'
 import { UserMenu } from '@/components/ui/user-menu'
 import { useAppStore } from '@/store'
+import { Scale, Library, Trophy, Check } from 'lucide-react'
 import type { SavedDeck } from '@/types/match'
 
 interface SuggestedDeck {
@@ -108,11 +109,11 @@ export default function PodPage() {
           <button className="btn-ghost" onClick={() => router.push('/')} style={{ padding: '7px 12px', fontSize: 13 }}>← Setup</button>
           <div style={{ width: 1, height: 20, background: 'var(--c-sub)' }} />
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <div style={{ width: 22, height: 22, borderRadius: 5, background: 'var(--c-green)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11 }}>⚖</div>
+            <div style={{ width: 22, height: 22, borderRadius: 5, background: 'var(--c-green)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'oklch(10% 0.025 162)' }}><Scale size={13} /></div>
             <span style={{ fontWeight: 600, fontSize: 14 }}>Deck Balancer</span>
           </div>
-          <button className="btn-ghost" style={{ fontSize: 12, padding: '7px 12px' }} onClick={() => router.push('/decks')}>📚 Library</button>
-          <button className="btn-ghost" style={{ fontSize: 12, padding: '7px 12px' }} onClick={() => router.push('/leaderboard')}>🏆 Leaderboard</button>
+          <button className="btn-ghost" style={{ fontSize: 12, padding: '7px 12px' }} onClick={() => router.push('/decks')}><Library size={13} /> Library</button>
+          <button className="btn-ghost" style={{ fontSize: 12, padding: '7px 12px' }} onClick={() => router.push('/leaderboard')}><Trophy size={13} /> Leaderboard</button>
         </div>
         <UserMenu />
       </header>
@@ -156,7 +157,7 @@ export default function PodPage() {
 
           {!libraryLoading && library.length === 0 && (
             <div style={{ padding: '40px 0', textAlign: 'center' }}>
-              <div style={{ fontSize: 28, marginBottom: 8, opacity: .3 }}>📚</div>
+              <div style={{ marginBottom: 8, opacity: .3, display: 'flex', justifyContent: 'center' }}><Library size={28} /></div>
               <div style={{ fontSize: 13, color: 'var(--c-text3)', lineHeight: 1.7 }}>No decks in the library yet.<br />Add decks via Setup → Moxfield tab → Save to Library.</div>
             </div>
           )}
@@ -179,7 +180,7 @@ export default function PodPage() {
                   >
                     <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 6 }}>
                       <div style={{ fontWeight: 600, fontSize: 13, color: isSelected ? 'var(--c-green-hi)' : 'var(--c-text)', flex: 1, marginRight: 6 }}>{deck.name}</div>
-                      {isSelected && <span style={{ fontSize: 13, color: 'var(--c-green-hi)', flexShrink: 0 }}>✓</span>}
+                      {isSelected && <Check size={13} style={{ color: 'var(--c-green-hi)', flexShrink: 0 }} />}
                     </div>
                     {deck.commander && <div style={{ fontSize: 11, color: 'var(--c-gold)', fontStyle: 'italic', fontFamily: "var(--font-cormorant), serif", marginBottom: 5 }}>{deck.commander}</div>}
                     {(deck.colors?.length ?? 0) > 0 && <ColorPips colors={deck.colors!} size={16} />}

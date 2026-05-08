@@ -6,6 +6,7 @@ import type { AnalysisReport } from '@/types/analysis'
 import type { SaveMatchPayload } from '@/types/match'
 import { PLAYER_ACCENTS } from '@/lib/design'
 import BalanceReport from './BalanceReport'
+import { Check, Scale } from 'lucide-react'
 
 const LOADING_MSGS = [
   'Mapping synergy vectors…',
@@ -74,7 +75,7 @@ function SaveMatchForm({ report, players }: { report: AnalysisReport; players: P
   if (saved) {
     return (
       <div style={{ padding: '16px 20px', borderRadius: 'var(--rad-lg)', background: 'var(--c-green-bg)', border: '1px solid oklch(57% .205 162/.3)', display: 'flex', alignItems: 'center', gap: 12 }}>
-        <span style={{ fontSize: 18 }}>✓</span>
+        <Check size={18} style={{ color: 'var(--c-green-hi)', flexShrink: 0 }} />
         <div>
           <div style={{ fontWeight: 600, fontSize: 14, color: 'var(--c-green-hi)' }}>Match saved</div>
           <div style={{ fontSize: 12, color: 'var(--c-text3)', marginTop: 2 }}>Find it in History → Match Log</div>
@@ -223,7 +224,7 @@ export default function AnalyzerPanel({ players }: { players: Player[] }) {
 
       {status === 'idle' && !report && (
         <div style={{ border: '1px dashed var(--c-sub)', borderRadius: 'var(--rad-lg)', padding: '32px 24px', textAlign: 'center', color: 'var(--c-text3)' }}>
-          <div style={{ fontSize: 28, marginBottom: 8, opacity: .4 }}>⚖</div>
+          <div style={{ marginBottom: 8, opacity: .4, display: 'flex', justifyContent: 'center' }}><Scale size={28} /></div>
           <div style={{ fontSize: 14, fontWeight: 500 }}>Run the analysis once the pod looks right.</div>
           <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 14, flexWrap: 'wrap' }}>
             {['Power compression', 'Mana velocity', 'Threat density', 'Synergy ceiling'].map(t => (

@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { UserMenu } from '@/components/ui/user-menu'
+import { Scale, Library, Trophy, Award } from 'lucide-react'
 
 interface LeaderboardEntry {
   player_name: string
@@ -12,7 +13,7 @@ interface LeaderboardEntry {
   top_commander: string | null
 }
 
-const MEDALS = ['🥇', '🥈', '🥉']
+const MEDAL_COLORS = ['oklch(80% .20 82)', 'oklch(72% .14 250)', 'oklch(62% .18 50)']
 
 export default function LeaderboardPage() {
   const router = useRouter()
@@ -36,10 +37,10 @@ export default function LeaderboardPage() {
           <button className="btn-ghost" onClick={() => router.push('/')} style={{ padding: '7px 12px', fontSize: 13 }}>← Setup</button>
           <div style={{ width: 1, height: 20, background: 'var(--c-sub)' }} />
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <div style={{ width: 22, height: 22, borderRadius: 5, background: 'var(--c-green)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11 }}>⚖</div>
+            <div style={{ width: 22, height: 22, borderRadius: 5, background: 'var(--c-green)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'oklch(10% 0.025 162)' }}><Scale size={13} /></div>
             <span style={{ fontWeight: 600, fontSize: 14 }}>Deck Balancer</span>
           </div>
-          <button className="btn-ghost" style={{ fontSize: 12, padding: '7px 12px' }} onClick={() => router.push('/decks')}>📚 Library</button>
+          <button className="btn-ghost" style={{ fontSize: 12, padding: '7px 12px' }} onClick={() => router.push('/decks')}><Library size={13} /> Library</button>
         </div>
         <UserMenu />
       </header>
@@ -66,7 +67,7 @@ export default function LeaderboardPage() {
 
         {!loading && !error && entries.length === 0 && (
           <div style={{ padding: '60px 0', textAlign: 'center' }}>
-            <div style={{ fontSize: 32, marginBottom: 12, opacity: .3 }}>🏆</div>
+            <div style={{ marginBottom: 12, opacity: .3, display: 'flex', justifyContent: 'center' }}><Trophy size={32} /></div>
             <div style={{ fontSize: 14, color: 'var(--c-text3)', lineHeight: 1.7 }}>No matches recorded yet.<br />Save a match result to start tracking stats.</div>
           </div>
         )}
@@ -82,7 +83,7 @@ export default function LeaderboardPage() {
                   className="mtg-panel"
                   style={{
                     padding: '18px 22px',
-                    borderLeft: isTop ? `3px solid ${['oklch(80% .20 82)', 'oklch(72% .14 250)', 'oklch(62% .18 50)'][i]}` : '3px solid var(--c-sub)',
+                    borderLeft: isTop ? `3px solid ${MEDAL_COLORS[i]}` : '3px solid var(--c-sub)',
                     animation: `fadeUp 300ms ${i * 60}ms var(--ease) both`,
                   }}
                 >
@@ -90,7 +91,7 @@ export default function LeaderboardPage() {
                     {/* Rank */}
                     <div style={{ minWidth: 36, textAlign: 'center' }}>
                       {i < 3 ? (
-                        <span style={{ fontSize: 22 }}>{MEDALS[i]}</span>
+                        <Award size={22} style={{ color: MEDAL_COLORS[i] }} />
                       ) : (
                         <span style={{ fontFamily: 'monospace', fontSize: 18, fontWeight: 700, color: 'var(--c-text3)' }}>#{i + 1}</span>
                       )}

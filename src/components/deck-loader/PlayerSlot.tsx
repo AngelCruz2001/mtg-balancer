@@ -6,6 +6,7 @@ import { ColorPicker } from '@/components/ui/color-picker'
 import type { PlayerSeat } from '@/types/deck'
 import type { SavedDeck } from '@/types/match'
 import { PLAYER_ACCENTS, DEMO_LISTS } from '@/lib/design'
+import { Check, Library, X, ClipboardList, Link } from 'lucide-react'
 
 type LoadMode = 'paste' | 'moxfield' | 'library'
 
@@ -70,12 +71,12 @@ function SaveToLibraryForm({ deckRaw, commander, colors, moxfieldUrl }: { deckRa
   const [saved, setSaved] = useState(false)
   const [err, setErr] = useState<string | null>(null)
 
-  if (saved) return <span style={{ fontSize: 12, color: 'var(--c-green-hi)' }}>✓ Saved to library</span>
+  if (saved) return <span style={{ fontSize: 12, color: 'var(--c-green-hi)', display: 'inline-flex', alignItems: 'center', gap: 5 }}><Check size={12} /> Saved to library</span>
 
   if (!open) {
     return (
       <button className="btn-ghost" style={{ fontSize: 12, padding: '5px 10px' }} onClick={() => { setName(commander || 'New Deck'); setOpen(true) }}>
-        📚 Save to Library
+        <Library size={12} /> Save to Library
       </button>
     )
   }
@@ -252,7 +253,7 @@ export default function PlayerSlot({ seat, idx, expanded, onToggleExpand }: Play
           </div>
           <span style={{ fontWeight: 600, fontSize: 15 }}>{player?.name || `Player ${idx + 1}`}</span>
         </div>
-        {isLoaded && <span className="badge-green">✓ {totalCards} cards</span>}
+        {isLoaded && <span className="badge-green" style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><Check size={11} /> {totalCards} cards</span>}
         {isLoading && <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--c-text3)' }}><div className="spinner" style={{ width: 14, height: 14 }} /> Resolving…</span>}
       </div>
 
@@ -293,7 +294,7 @@ export default function PlayerSlot({ seat, idx, expanded, onToggleExpand }: Play
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 6 }}>
             <SaveToLibraryForm deckRaw={deckRaw} commander={player?.commander ?? ''} colors={player?.colors ?? []} moxfieldUrl={sourceMoxfield} />
             <button className="btn-ghost" style={{ fontSize: 12, padding: '5px 10px' }} onClick={() => { clearPlayer(seat); setMoxfieldUrl(''); setSourceMoxfield(undefined) }}>
-              ✕ Change
+              <X size={12} /> Change
             </button>
           </div>
         </div>
@@ -303,7 +304,7 @@ export default function PlayerSlot({ seat, idx, expanded, onToggleExpand }: Play
           <div style={{ display: 'flex', borderBottom: '1px solid var(--c-sub)', marginBottom: 2 }}>
             {(['paste', 'moxfield', 'library'] as LoadMode[]).map(m => (
               <button key={m} type="button" style={TAB_STYLE(mode === m)} onClick={() => setMode(m)}>
-                {m === 'paste' ? '📋 Paste' : m === 'moxfield' ? '🔗 Import URL' : '📚 Library'}
+                {m === 'paste' ? <><ClipboardList size={12} /> Paste</> : m === 'moxfield' ? <><Link size={12} /> Import URL</> : <><Library size={12} /> Library</>}
               </button>
             ))}
           </div>

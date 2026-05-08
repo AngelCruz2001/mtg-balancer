@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ColorPips } from '@/components/ui/color-pips'
 import { UserMenu } from '@/components/ui/user-menu'
+import { Scale, Trophy, Library, X, Check } from 'lucide-react'
 import type { SavedDeck } from '@/types/match'
 
 function DeckCard({ deck, onDeleted }: { deck: SavedDeck; onDeleted: (id: string) => void }) {
@@ -48,7 +49,7 @@ function DeckCard({ deck, onDeleted }: { deck: SavedDeck; onDeleted: (id: string
             </a>
           )}
           <button className="btn-ghost" style={{ fontSize: 11, padding: '5px 9px' }} onClick={handleDelete} disabled={deleting}>
-            ✕
+            <X size={12} />
           </button>
         </div>
       </div>
@@ -67,7 +68,7 @@ function DeckCard({ deck, onDeleted }: { deck: SavedDeck; onDeleted: (id: string
       </div>
 
       <button className="btn-primary" style={{ fontSize: 13 }} onClick={copyList}>
-        {copied ? '✓ Copied!' : 'Copy Decklist'}
+        {copied ? <><Check size={13} /> Copied!</> : 'Copy Decklist'}
       </button>
     </div>
   )
@@ -101,10 +102,10 @@ export default function DecksPage() {
           <button className="btn-ghost" onClick={() => router.push('/')} style={{ padding: '7px 12px', fontSize: 13 }}>← Setup</button>
           <div style={{ width: 1, height: 20, background: 'var(--c-sub)' }} />
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <div style={{ width: 22, height: 22, borderRadius: 5, background: 'var(--c-green)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11 }}>⚖</div>
+            <div style={{ width: 22, height: 22, borderRadius: 5, background: 'var(--c-green)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'oklch(10% 0.025 162)' }}><Scale size={13} /></div>
             <span style={{ fontWeight: 600, fontSize: 14 }}>Deck Balancer</span>
           </div>
-          <button className="btn-ghost" style={{ fontSize: 12, padding: '7px 12px' }} onClick={() => router.push('/leaderboard')}>🏆 Leaderboard</button>
+          <button className="btn-ghost" style={{ fontSize: 12, padding: '7px 12px' }} onClick={() => router.push('/leaderboard')}><Trophy size={13} /> Leaderboard</button>
         </div>
         <UserMenu />
       </header>
@@ -140,7 +141,7 @@ export default function DecksPage() {
 
         {!loading && !error && filtered.length === 0 && (
           <div style={{ padding: '60px 0', textAlign: 'center' }}>
-            <div style={{ fontSize: 32, marginBottom: 12, opacity: .3 }}>📚</div>
+            <div style={{ marginBottom: 12, opacity: .3, display: 'flex', justifyContent: 'center' }}><Library size={32} /></div>
             <div style={{ fontSize: 14, color: 'var(--c-text3)', lineHeight: 1.7 }}>
               {search ? 'No decks match your search.' : 'No decks saved yet.\nLoad a deck from Moxfield in Setup and save it to the library.'}
             </div>

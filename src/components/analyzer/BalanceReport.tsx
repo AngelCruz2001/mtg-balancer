@@ -4,6 +4,7 @@ import { CountUp } from '@/components/ui/count-up'
 import { RadarChart } from '@/components/ui/radar-chart'
 import type { AnalysisReport, PlayerScore } from '@/types/analysis'
 import ReactMarkdown from 'react-markdown'
+import { AlertTriangle, Scale } from 'lucide-react'
 
 function ScoreCard({ score, idx, animate }: { score: PlayerScore; idx: number; animate: boolean }) {
   const sc = score.score
@@ -56,7 +57,7 @@ export default function BalanceReport({ report, animate = false }: { report: Ana
     <div className="afu" style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
       {/* Verdict banner */}
       <div style={{ padding: '16px 22px', borderRadius: 'var(--rad-lg)', background: verdictBg, border: `1px solid ${verdictBorder}`, display: 'flex', alignItems: 'center', gap: 12 }}>
-        <span style={{ fontSize: 20 }}>{spread > 22 ? '⚠' : '⚖'}</span>
+        {spread > 22 ? <AlertTriangle size={20} style={{ flexShrink: 0 }} /> : <Scale size={20} style={{ flexShrink: 0 }} />}
         <span style={{ fontWeight: 500, fontSize: 15, color: 'var(--c-text)' }}>{verdict}</span>
       </div>
 

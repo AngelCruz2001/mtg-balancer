@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import { X } from 'lucide-react'
 
 interface CardResult {
   name: string
@@ -33,7 +34,7 @@ export default function CardLookupModal({ onClose }: { onClose: () => void }) {
       <div className="modal" onClick={e => e.stopPropagation()}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
           <h2 style={{ fontSize: 20, fontWeight: 700 }}>Card Lookup</h2>
-          <button className="btn-icon" onClick={onClose}>✕</button>
+          <button className="btn-icon" onClick={onClose}><X size={14} /></button>
         </div>
         <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
           <input
