@@ -59,12 +59,12 @@ export default function DeckLoaderPanel() {
   const canStep3 = readyCount >= 2
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '32px 20px' }}>
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', padding: '48px 20px' }}>
       <div style={{ width: '100%', maxWidth: 700 }}>
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 36 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ width: 28, height: 28, borderRadius: 6, background: 'var(--c-green)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}>⚖</div>
+            <div style={{ width: 22, height: 22, borderRadius: 5, background: 'var(--c-green)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11 }}>⚖</div>
             <span style={{ fontWeight: 700, fontSize: 15, letterSpacing: '.02em' }}>Deck Balancer</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -101,7 +101,7 @@ export default function DeckLoaderPanel() {
               ))}
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: `repeat(${count > 2 ? count : 2}, 1fr)`, gap: 12 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 }}>
               {Array.from({ length: count }, (_, i) => (
                 <div key={i}>
                   <label style={{ display: 'block', fontSize: 11, fontWeight: 600, letterSpacing: '.18em', textTransform: 'uppercase', color: PLAYER_ACCENTS[i].c, marginBottom: 8 }}>
@@ -196,7 +196,7 @@ export default function DeckLoaderPanel() {
                     <div style={{ display: 'flex', gap: 8 }}>
                       {[['Cards', total], ['Lands', lands], ['Avg CMC', avgCmc]].map(([l, v]) => (
                         <div key={String(l)} style={{ flex: 1, background: 'var(--c-bg)', border: '1px solid var(--c-sub)', borderRadius: 10, padding: '7px 10px', textAlign: 'center' }}>
-                          <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '.18em', textTransform: 'uppercase', color: 'var(--c-text3)', marginBottom: 4 }}>{l}</div>
+                          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--c-text3)', marginBottom: 4 }}>{l}</div>
                           <div style={{ fontSize: 16, fontWeight: 600 }}>{v}</div>
                         </div>
                       ))}

@@ -272,7 +272,7 @@ export default function PlayerSlot({ seat, idx, expanded, onToggleExpand }: Play
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 6 }}>
             {[['Total', totalCards], ['Lands', landCount], ['Avg CMC', avgCmc], ['Value', deckPrice > 0 ? `$${deckPrice.toFixed(0)}` : '—']].map(([l, v]) => (
               <div key={String(l)} style={{ background: 'var(--c-bg)', border: '1px solid var(--c-sub)', borderRadius: 8, padding: '6px 8px' }}>
-                <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '.16em', textTransform: 'uppercase', color: 'var(--c-text3)', marginBottom: 3 }}>{l}</div>
+                <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.13em', textTransform: 'uppercase', color: 'var(--c-text3)', marginBottom: 3 }}>{l}</div>
                 <div style={{ fontSize: 14, fontWeight: 600 }}>{v}</div>
               </div>
             ))}

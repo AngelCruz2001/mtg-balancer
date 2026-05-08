@@ -74,7 +74,7 @@ function MatchCard({ match }: { match: Match }) {
           {/* Analysis */}
           {match.analysis_explanation && (
             <div>
-              <div className="kicker" style={{ marginBottom: 8, fontSize: 9 }}>Claude Analysis</div>
+              <div className="kicker" style={{ marginBottom: 8 }}>Claude Analysis</div>
               <div style={{ fontSize: 12, color: 'var(--c-text3)', lineHeight: 1.7 }}>
                 <ReactMarkdown>{match.analysis_explanation}</ReactMarkdown>
               </div>
@@ -105,7 +105,7 @@ export default function HistoryPanel({ onClose }: { onClose: () => void }) {
   return (
     <>
       <div className="modal-bg" style={{ justifyContent: 'flex-end', alignItems: 'stretch', background: 'oklch(0% 0 0 / .4)' }} onClick={onClose} />
-      <div className="side-panel">
+      <div className="side-panel" onClick={e => e.stopPropagation()}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 22 }}>
           <div>
             <div className="kicker" style={{ marginBottom: 5 }}>Session Log</div>

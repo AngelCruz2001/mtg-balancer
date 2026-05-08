@@ -115,7 +115,7 @@ export default function LeaderboardPage() {
                         { l: 'Avg Score', v: e.avg_score },
                       ].map(({ l, v, hi }) => (
                         <div key={l} style={{ textAlign: 'center', minWidth: 52 }}>
-                          <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '.18em', textTransform: 'uppercase', color: 'var(--c-text3)', marginBottom: 3 }}>{l}</div>
+                          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--c-text3)', marginBottom: 3 }}>{l}</div>
                           <div style={{ fontSize: 18, fontWeight: 700, color: hi ? 'var(--c-green-hi)' : 'var(--c-text)' }}>{v}</div>
                         </div>
                       ))}

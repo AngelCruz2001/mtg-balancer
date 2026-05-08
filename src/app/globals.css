@@ -144,7 +144,7 @@ body.theme-obsidian {
 .badge-muted { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:99px; font-size:11px; font-weight:600; letter-spacing:.04em; background:oklch(18% .02 160); border:1px solid var(--c-sub); color:var(--c-text2); }
 .badge-red   { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:99px; font-size:11px; font-weight:600; letter-spacing:.04em; background:oklch(18% .08 20/.18); border:1px solid oklch(60% .22 20/.28); color:oklch(68% .18 20); }
 
-.kicker { font-size:10px; font-weight:700; letter-spacing:.25em; text-transform:uppercase; color:var(--c-gold); font-family: var(--font-outfit), 'Outfit', sans-serif; }
+.kicker { font-size:11px; font-weight:700; letter-spacing:.22em; text-transform:uppercase; color:var(--c-gold); font-family: var(--font-outfit), 'Outfit', sans-serif; }
 .df     { font-family: var(--font-cormorant), 'Cormorant Garamond', serif; font-style:italic; letter-spacing:-.03em; line-height:1.05; }
 
 .mtg-input, .mtg-textarea {
@@ -157,7 +157,7 @@ body.theme-obsidian {
   border-color: var(--c-green); box-shadow: 0 0 0 3px oklch(57% .205 162 / .12);
 }
 .mtg-input::placeholder, .mtg-textarea::placeholder { color: var(--c-text3); }
-.mtg-textarea { resize: none; line-height: 1.6; font-size: 12.5px; font-family: monospace; }
+.mtg-textarea { resize: none; line-height: 1.6; font-size: 13px; font-family: monospace; }
 
 .modal-bg {
   position: fixed; inset: 0; background: oklch(0% 0 0 / .65); z-index: 90;
@@ -166,9 +166,10 @@ body.theme-obsidian {
 .modal {
   background: var(--c-raised); border: 1px solid var(--c-border); border-radius: var(--rad-xl);
   width: min(480px, 92vw); padding: 28px; animation: fadeUp 280ms var(--ease);
+  max-height: min(90vh, 640px); overflow-y: auto;
 }
 .side-panel {
-  position: fixed; top: 0; right: 0; bottom: 0; width: 300px;
+  position: fixed; top: 0; right: 0; bottom: 0; width: min(300px, 100vw);
   background: var(--c-surface); border-left: 1px solid var(--c-border);
   z-index: 100; padding: 24px; overflow-y: auto; animation: slideR 250ms var(--ease);
 }

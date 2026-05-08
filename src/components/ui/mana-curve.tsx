@@ -14,7 +14,7 @@ export function ManaCurve({ curve = [], compact = false }: { curve: number[]; co
               : 'var(--c-sub)',
             transition: 'height 0.55s cubic-bezier(0.16,1,0.3,1)',
           }} />
-          <span style={{ fontSize: 9, color: 'var(--c-text3)', fontFamily: 'Outfit, sans-serif', lineHeight: 1 }}>
+          <span style={{ fontSize: 11, color: 'var(--c-text3)', fontFamily: 'Outfit, sans-serif', lineHeight: 1 }}>
             {cmc === 7 ? '7+' : cmc}
           </span>
         </div>

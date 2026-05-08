@@ -23,12 +23,12 @@ function ScoreCard({ score, idx, animate }: { score: PlayerScore; idx: number; a
         <div style={{ fontSize: 40, fontWeight: 700, lineHeight: 1, color, fontFamily: 'monospace' }}>
           {animate ? <CountUp to={sc} duration={1200} /> : sc}
         </div>
-        <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '.15em', textTransform: 'uppercase', color: 'var(--c-text3)', marginTop: 2 }}>/ 100</div>
+        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.12em', textTransform: 'uppercase', color: 'var(--c-text3)', marginTop: 2 }}>/ 100</div>
       </div>
       <div style={{ flex: 1 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
           <span style={{ fontWeight: 600, fontSize: 14 }}>{score.name}</span>
-          <span style={{ display: 'inline-block', padding: '2px 8px', borderRadius: 99, fontSize: 10, fontWeight: 700, letterSpacing: '.06em', background: labelBg, border: `1px solid ${labelBorder}`, color: labelColor }}>{label}</span>
+          <span style={{ display: 'inline-block', padding: '2px 8px', borderRadius: 99, fontSize: 11, fontWeight: 700, letterSpacing: '.05em', background: labelBg, border: `1px solid ${labelBorder}`, color: labelColor }}>{label}</span>
         </div>
         <ScoreBar score={sc} animate={animate} />
         {score.summary && <p style={{ marginTop: 7, fontSize: 12, color: 'var(--c-text3)', lineHeight: 1.5 }}>{score.summary}</p>}
@@ -61,7 +61,7 @@ export default function BalanceReport({ report, animate = false }: { report: Ana
       </div>
 
       {/* Radar + scores */}
-      <div style={{ display: 'grid', gridTemplateColumns: report.scores.length <= 2 ? '240px 1fr' : '1fr', gap: 20, alignItems: 'start' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: report.scores.length <= 2 ? '280px 1fr' : '1fr', gap: 20, alignItems: 'start' }}>
         {report.scores.length <= 2 && (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, paddingTop: 8 }}>
             <RadarChart players={radarPlayers} size={220} />

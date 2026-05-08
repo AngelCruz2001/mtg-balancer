@@ -44,7 +44,7 @@ export function MatchNav({
 export default function MatchTable({ players }: { players: Player[] }) {
   const cols = players.length <= 2 ? 2 : players.length === 3 ? 3 : 2
   return (
-    <div style={{ maxWidth: 1360, margin: '0 auto', padding: '24px 24px 0' }}>
+    <div style={{ padding: '24px 0 0' }}>
       <div style={{ marginBottom: 20 }}>
         <div className="kicker" style={{ marginBottom: 6 }}>Game Table</div>
         <h1 className="df" style={{ fontSize: 40, color: 'var(--c-text)' }}>Match Table</h1>

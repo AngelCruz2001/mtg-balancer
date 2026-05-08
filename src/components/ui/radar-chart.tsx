@@ -24,7 +24,7 @@ export function RadarChart({
     AXES.map((_, i) => pt(i, r * s, n, cx, cy).join(',')).join(' ')
   )
   const axisEnds = AXES.map((_, i) => pt(i, r, n, cx, cy))
-  const labels = AXES.map((ax, i) => ({ ax, p: pt(i, r + 22, n, cx, cy) }))
+  const labels = AXES.map((ax, i) => ({ ax, p: pt(i, r + 26, n, cx, cy) }))
 
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ overflow: 'visible' }}>
@@ -36,7 +36,7 @@ export function RadarChart({
       ))}
       {labels.map(({ ax, p: [x, y] }) => (
         <text key={ax} x={x} y={y} textAnchor="middle" dominantBaseline="middle"
-          fill="oklch(50% 0.020 160)" fontSize={9} fontFamily="Outfit" fontWeight={500} letterSpacing="0.04em">
+          fill="oklch(50% 0.020 160)" fontSize={11} fontFamily="Outfit" fontWeight={500} letterSpacing="0.03em">
           {ax}
         </text>
       ))}

@@ -69,7 +69,7 @@ export default function PlayerZone({ player, idx }: { player: Player; idx: numbe
             <div style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-.01em', lineHeight: 1 }}>{player.name}</div>
           </div>
           <div style={{ textAlign: 'right' }}>
-            <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '.18em', textTransform: 'uppercase', color: 'var(--c-text3)', marginBottom: 4 }}>Deck Size</div>
+            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.15em', textTransform: 'uppercase', color: 'var(--c-text3)', marginBottom: 4 }}>Deck Size</div>
             <div style={{ fontFamily: 'monospace', fontSize: 22, color: 'var(--c-text)' }}>{total}</div>
           </div>
         </div>
@@ -93,7 +93,7 @@ export default function PlayerZone({ player, idx }: { player: Player; idx: numbe
               <div style={{ position: 'absolute', inset: 0, background: artUrl ? 'linear-gradient(180deg, oklch(0% 0 0/.15) 0%, oklch(0% 0 0/.7) 100%)' : 'linear-gradient(180deg, transparent 40%, var(--c-surface) 100%)' }} />
               {player.commander ? (
                 <div style={{ position: 'relative', textAlign: 'center', padding: '0 12px' }}>
-                  <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '.16em', textTransform: 'uppercase', color: artUrl ? 'oklch(80% 0 0)' : acc.c, marginBottom: 3, opacity: .85 }}>Commander</div>
+                  <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.13em', textTransform: 'uppercase', color: artUrl ? 'oklch(80% 0 0)' : acc.c, marginBottom: 3, opacity: .85 }}>Commander</div>
                   <div style={{ fontFamily: "var(--font-cormorant), 'Cormorant Garamond', serif", fontStyle: 'italic', fontSize: 14, fontWeight: 600, color: artUrl ? 'white' : 'var(--c-text)', lineHeight: 1.3, textShadow: artUrl ? '0 1px 4px oklch(0% 0 0/.8)' : 'none' }}>{player.commander}</div>
                 </div>
               ) : (
@@ -110,20 +110,20 @@ export default function PlayerZone({ player, idx }: { player: Player; idx: numbe
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 6, marginBottom: 12 }}>
           {[['Lands', lands], ['Spells', spells], ['Avg CMC', avgCmc], ['Value', deckPrice > 0 ? `$${deckPrice.toFixed(0)}` : '—']].map(([l, v]) => (
             <div key={String(l)} style={{ background: 'var(--c-bg)', border: '1px solid var(--c-sub)', borderRadius: 9, padding: '7px 8px', textAlign: 'center' }}>
-              <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '.16em', textTransform: 'uppercase', color: 'var(--c-text3)', marginBottom: 3 }}>{l}</div>
+              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.13em', textTransform: 'uppercase', color: 'var(--c-text3)', marginBottom: 3 }}>{l}</div>
               <div style={{ fontSize: 15, fontWeight: 600 }}>{v}</div>
             </div>
           ))}
         </div>
 
         <div>
-          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '.18em', textTransform: 'uppercase', color: 'var(--c-text3)', marginBottom: 6 }}>Mana Curve</div>
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.15em', textTransform: 'uppercase', color: 'var(--c-text3)', marginBottom: 6 }}>Mana Curve</div>
           <ManaCurve curve={curve} compact />
         </div>
       </div>
 
-      <div style={{ padding: '12px 18px', flex: 1, overflowY: 'auto', maxHeight: 260 }}>
-        <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '.18em', textTransform: 'uppercase', color: 'var(--c-text3)', marginBottom: 8 }}>Card Library</div>
+      <div style={{ padding: '12px 18px' }}>
+        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.15em', textTransform: 'uppercase', color: 'var(--c-text3)', marginBottom: 8 }}>Card Library</div>
         {groups.map(g => <CardSection key={g.l} group={g} />)}
       </div>
     </div>

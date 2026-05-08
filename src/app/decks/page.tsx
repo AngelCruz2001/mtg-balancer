@@ -55,12 +55,12 @@ function DeckCard({ deck, onDeleted }: { deck: SavedDeck; onDeleted: (id: string
 
       <div style={{ display: 'flex', gap: 8 }}>
         <div style={{ flex: 1, background: 'var(--c-bg)', border: '1px solid var(--c-sub)', borderRadius: 8, padding: '6px 10px', textAlign: 'center' }}>
-          <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '.16em', textTransform: 'uppercase', color: 'var(--c-text3)', marginBottom: 2 }}>Cards</div>
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.13em', textTransform: 'uppercase', color: 'var(--c-text3)', marginBottom: 2 }}>Cards</div>
           <div style={{ fontSize: 15, fontWeight: 600 }}>{lineCount}</div>
         </div>
         {deck.profiles?.name && (
           <div style={{ flex: 1, background: 'var(--c-bg)', border: '1px solid var(--c-sub)', borderRadius: 8, padding: '6px 10px', textAlign: 'center', overflow: 'hidden' }}>
-            <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: '.16em', textTransform: 'uppercase', color: 'var(--c-text3)', marginBottom: 2 }}>Added by</div>
+            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.13em', textTransform: 'uppercase', color: 'var(--c-text3)', marginBottom: 2 }}>Added by</div>
             <div style={{ fontSize: 12, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{deck.profiles.name}</div>
           </div>
         )}
