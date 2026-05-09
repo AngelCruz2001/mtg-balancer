@@ -10,25 +10,62 @@ interface ImportResult {
   colors: string[]
 }
 
-async function fromMoxfield(deckId: string): Promise<ImportResult> {
-  const res = await fetch(`https://api.moxfield.com/v2/decks/all/${deckId}`, {
-    headers: { 'User-Agent': 'mtg-deck-balancer/1.0' },
-  })
-  if (!res.ok) throw new Error(res.status === 404 ? 'Deck not found or private' : 'Moxfield returned an error')
+interface MoxfieldEntry {
+  quantity: number
+  card?: {
+    name?: string
+    color_identity?: string[]
+  }
+}
 
-  const data = await res.json()
-  const commanders: Record<string, { quantity: number; card?: { color_identity?: string[] } }> = data.commanders ?? {}
-  const mainboard: Record<string, { quantity: number }> = data.mainboard ?? {}
+async function fetchMoxfieldDeck(deckId: string) {
+  const res = await fetch(`https://api2.moxfield.com/v2/decks/all/${deckId}/`, {
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'User-Agent': 'mtg-deck-balancer/1.0',
+    },
+    cache: 'no-store',
+  })
+
+  if (!res.ok) {
+    const contentType = res.headers.get('content-type') ?? ''
+
+    if (res.status === 404) {
+      throw new Error('Deck not found or private')
+    }
+
+    if (res.status === 403 && contentType.includes('text/html')) {
+      throw new Error('Moxfield blocked this server request (403 / Cloudflare)')
+    }
+
+    throw new Error(`Moxfield returned ${res.status}`)
+  }
+
+  return res.json()
+}
+
+async function fromMoxfield(deckId: string): Promise<ImportResult> {
+  const data = await fetchMoxfieldDeck(deckId)
+  const commanders = (data.commanders ?? {}) as Record<string, MoxfieldEntry>
+  const mainboard = (data.mainboard ?? {}) as Record<string, MoxfieldEntry>
 
   const lines: string[] = []
-  for (const [name, e] of Object.entries(commanders)) lines.push(`${e.quantity} ${name}`)
-  for (const [name, e] of Object.entries(mainboard)) lines.push(`${e.quantity} ${name}`)
+  for (const [name, entry] of Object.entries(commanders)) {
+    lines.push(`${entry.quantity} ${entry.card?.name ?? name}`)
+  }
+  for (const [name, entry] of Object.entries(mainboard)) {
+    lines.push(`${entry.quantity} ${entry.card?.name ?? name}`)
+  }
+
+  const firstCommander = Object.entries(commanders)[0]
+  const commanderName = firstCommander?.[1]?.card?.name ?? firstCommander?.[0] ?? ''
 
   return {
     raw: lines.join('\n'),
     name: data.name ?? 'Imported Deck',
-    commander: Object.keys(commanders)[0] ?? '',
-    colors: Object.values(commanders)[0]?.card?.color_identity ?? [],
+    commander: commanderName,
+    colors: firstCommander?.[1]?.card?.color_identity ?? [],
   }
 }
 
@@ -111,7 +148,7 @@ export async function POST(req: Request) {
     let result: ImportResult
 
     if (url.includes('moxfield.com/decks/')) {
-      const match = url.match(/moxfield\.com\/decks\/([a-zA-Z0-9_-]+)/)
+      const match = url.match(/moxfield\.com\/decks\/([^/?#]+)/i)
       if (!match) throw new Error('Invalid Moxfield URL')
       result = await fromMoxfield(match[1])
     } else if (url.includes('archidekt.com/decks/')) {

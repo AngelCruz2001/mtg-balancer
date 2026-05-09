@@ -60,8 +60,8 @@ export default function DeckLoaderPanel() {
   const canStep3 = readyCount >= 2
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', padding: '48px 20px', overflowX: 'hidden' }}>
-      <div style={{ width: '100%', maxWidth: 700 }}>
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', padding: '32px 24px', overflowX: 'hidden' }}>
+      <div style={{ width: '100%', maxWidth: 1100 }}>
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 36 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -86,7 +86,7 @@ export default function DeckLoaderPanel() {
               <p style={{ color: 'var(--c-text2)', fontSize: 16, maxWidth: 440 }}>How many players are sitting down? Name each seat before continuing.</p>
             </div>
 
-            <div style={{ display: 'flex', gap: 12 }}>
+            <div style={{ display: 'flex', gap: 12, maxWidth: 480 }}>
               {[2, 3, 4].map((n, i) => (
                 <button key={n} type="button" onClick={() => setCount(n)} style={{
                   flex: 1, padding: '16px 12px', borderRadius: 'var(--rad-lg)', cursor: 'pointer',
@@ -102,7 +102,7 @@ export default function DeckLoaderPanel() {
               ))}
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: `repeat(${count}, 1fr)`, gap: 12, maxWidth: 700 }}>
               {Array.from({ length: count }, (_, i) => (
                 <div key={i}>
                   <label style={{ display: 'block', fontSize: 11, fontWeight: 600, letterSpacing: '.18em', textTransform: 'uppercase', color: PLAYER_ACCENTS[i].c, marginBottom: 8 }}>

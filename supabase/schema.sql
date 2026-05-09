@@ -82,14 +82,17 @@ CREATE POLICY "Users can insert match_players for their own matches"
 
 -- ── Deck Library ──────────────────────────────────────────────────────────
 CREATE TABLE public.decks (
-  id           uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-  name         text NOT NULL,
-  commander    text,
-  colors       text[],
-  moxfield_url text,
-  deck_raw     text NOT NULL,
-  created_by   uuid REFERENCES public.profiles(id) ON DELETE SET NULL,
-  created_at   timestamptz DEFAULT now() NOT NULL
+  id              uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  name            text NOT NULL,
+  commander       text,
+  colors          text[],
+  moxfield_url    text,
+  deck_raw        text NOT NULL,
+  bracket         integer CHECK (bracket BETWEEN 1 AND 4),
+  description     text,
+  estimated_value numeric(10,2),
+  created_by      uuid REFERENCES public.profiles(id) ON DELETE SET NULL,
+  created_at      timestamptz DEFAULT now() NOT NULL
 );
 
 ALTER TABLE public.decks ENABLE ROW LEVEL SECURITY;
@@ -105,3 +108,15 @@ CREATE POLICY "Users can update their own decks"
 
 CREATE POLICY "Users can delete their own decks"
   ON public.decks FOR DELETE TO authenticated USING (auth.uid() = created_by);
+
+-- ── Wins by commander (used by deck library) ───────────────────────────────
+CREATE OR REPLACE FUNCTION public.get_wins_by_commander()
+RETURNS TABLE(commander text, wins bigint)
+LANGUAGE sql SECURITY DEFINER AS $$
+  SELECT mp.commander, COUNT(*) AS wins
+  FROM public.match_players mp
+  JOIN public.matches m ON m.id = mp.match_id
+  WHERE m.winner_seat = mp.seat
+    AND mp.commander IS NOT NULL
+  GROUP BY mp.commander;
+$$;

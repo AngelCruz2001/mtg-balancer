@@ -30,9 +30,13 @@ export interface SavedDeck {
   colors: string[] | null
   moxfield_url: string | null
   deck_raw: string
+  bracket: number | null
+  description: string | null
+  estimated_value: number | null
   created_by: string | null
   created_at: string
   profiles: { name: string } | null
+  wins?: number
 }
 
 export interface SaveMatchPayload {

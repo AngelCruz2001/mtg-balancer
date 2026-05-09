@@ -6,13 +6,20 @@ export async function GET() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const { data, error } = await supabase
-    .from('decks')
-    .select('*, profiles(name)')
-    .order('created_at', { ascending: false })
+  const [{ data, error }, { data: winsData }] = await Promise.all([
+    supabase.from('decks').select('*, profiles(name)').order('created_at', { ascending: false }),
+    supabase.rpc('get_wins_by_commander'),
+  ])
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  return NextResponse.json(data)
+
+  const winsMap: Record<string, number> = {}
+  for (const row of (winsData ?? []) as { commander: string; wins: number }[]) {
+    winsMap[row.commander] = row.wins
+  }
+
+  const enriched = (data ?? []).map(d => ({ ...d, wins: d.commander ? (winsMap[d.commander] ?? 0) : 0 }))
+  return NextResponse.json(enriched)
 }
 
 export async function POST(req: Request) {
