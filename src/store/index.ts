@@ -17,6 +17,7 @@ interface AppState {
   addPlayer: (seat: PlayerSeat, name: string) => void
   updatePlayer: (seat: PlayerSeat, patch: Partial<Player>) => void
   loadDeck: (seat: PlayerSeat, raw: string) => Promise<void>
+  resolveCard: (seat: PlayerSeat, errorLine: string, correctedLine: string) => Promise<string | null>
   clearPlayer: (seat: PlayerSeat) => void
   setBalanceReport: (report: AnalysisReport) => void
   setMatchStartAt: (ts: number) => void
@@ -53,6 +54,30 @@ export const useAppStore = create<AppState>()((set, get) => ({
       set(s => ({ players: s.players.map(p => p.seat === seat ? { ...p, loading: false, cards, parseErrors: errors, deckRaw: raw } : p) }))
     } catch (err) {
       set(s => ({ players: s.players.map(p => p.seat === seat ? { ...p, loading: false, error: err instanceof Error ? err.message : 'Failed to load deck' } : p) }))
+    }
+  },
+
+  resolveCard: async (seat, errorLine, correctedLine) => {
+    const match = correctedLine.trim().match(/^(\d+)\s+(.+)$/)
+    if (!match) return 'Use format: 1 Card Name'
+    const quantity = parseInt(match[1])
+    const name = match[2].trim()
+    try {
+      const res = await fetch(`https://api.scryfall.com/cards/named?fuzzy=${encodeURIComponent(name)}`)
+      if (!res.ok) return 'Card not found'
+      const card = await res.json()
+      set(s => ({
+        players: s.players.map(p =>
+          p.seat !== seat ? p : {
+            ...p,
+            cards: [...p.cards, { quantity, card }],
+            parseErrors: p.parseErrors.filter(e => e.line !== errorLine),
+          },
+        ),
+      }))
+      return null
+    } catch {
+      return 'Failed to fetch card'
     }
   },
 

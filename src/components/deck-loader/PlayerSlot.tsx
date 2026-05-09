@@ -6,7 +6,7 @@ import { ColorPicker } from '@/components/ui/color-picker'
 import type { PlayerSeat } from '@/types/deck'
 import type { SavedDeck } from '@/types/match'
 import { PLAYER_ACCENTS, DEMO_LISTS } from '@/lib/design'
-import { Check, Library, X, ClipboardList, Link } from 'lucide-react'
+import { Check, Library, X, ClipboardList, Link, RotateCcw } from 'lucide-react'
 
 type LoadMode = 'paste' | 'moxfield' | 'library'
 
@@ -61,6 +61,47 @@ function CommanderInput({ value, onChange }: { value: string; onChange: (v: stri
         </div>
       )}
     </div>
+  )
+}
+
+function CardErrorRow({ seat, errorLine }: { seat: PlayerSeat; errorLine: string }) {
+  const resolveCard = useAppStore(s => s.resolveCard)
+  const [value, setValue] = useState(errorLine)
+  const [status, setStatus] = useState<'idle' | 'loading' | 'error'>('idle')
+  const [errorMsg, setErrorMsg] = useState<string | null>(null)
+
+  async function retry() {
+    setStatus('loading')
+    setErrorMsg(null)
+    const err = await resolveCard(seat, errorLine, value)
+    if (err) { setStatus('error'); setErrorMsg(err) }
+    // on success the error disappears from the list via store update
+  }
+
+  return (
+    <li style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+      <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+        <input
+          className="mtg-input"
+          value={value}
+          onChange={e => { setValue(e.target.value); setStatus('idle'); setErrorMsg(null) }}
+          onKeyDown={e => e.key === 'Enter' && retry()}
+          style={{ flex: 1, fontSize: 12, padding: '5px 10px', fontFamily: 'monospace', borderColor: status === 'error' ? 'var(--c-red)' : undefined }}
+        />
+        <button
+          className="btn-icon"
+          onClick={retry}
+          disabled={status === 'loading' || !value.trim()}
+          title="Retry"
+          style={{ width: 28, height: 28, flexShrink: 0 }}
+        >
+          {status === 'loading'
+            ? <div className="spinner" style={{ width: 12, height: 12 }} />
+            : <RotateCcw size={12} />}
+        </button>
+      </div>
+      {errorMsg && <span style={{ fontSize: 11, color: 'var(--c-red)', paddingLeft: 2 }}>{errorMsg}</span>}
+    </li>
   )
 }
 
@@ -286,8 +327,15 @@ export default function PlayerSlot({ seat, idx, expanded, onToggleExpand }: Play
           )}
 
           {(player?.parseErrors?.length ?? 0) > 0 && (
-            <div style={{ padding: '7px 10px', borderRadius: 8, background: 'oklch(22% .08 82/.15)', border: '1px solid oklch(73% .17 82/.2)', fontSize: 11, color: 'var(--c-gold)' }}>
-              {player!.parseErrors.length} card{player!.parseErrors.length > 1 ? 's' : ''} not found
+            <div style={{ padding: '8px 12px', borderRadius: 8, background: 'oklch(22% .08 82/.15)', border: '1px solid oklch(73% .17 82/.2)', fontSize: 11, color: 'var(--c-gold)' }}>
+              <div style={{ fontWeight: 600, marginBottom: 8 }}>
+                {player!.parseErrors.length} card{player!.parseErrors.length > 1 ? 's' : ''} not found — fix &amp; retry
+              </div>
+              <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 6 }}>
+                {player!.parseErrors.map((e, i) => (
+                  <CardErrorRow key={i} seat={seat} errorLine={e.line} />
+                ))}
+              </ul>
             </div>
           )}
 
@@ -336,8 +384,15 @@ export default function PlayerSlot({ seat, idx, expanded, onToggleExpand }: Play
               </div>
 
               {(player?.parseErrors?.length ?? 0) > 0 && (
-                <div style={{ padding: '7px 10px', borderRadius: 8, background: 'oklch(22% .08 82/.15)', border: '1px solid oklch(73% .17 82/.2)', fontSize: 11, color: 'var(--c-gold)' }}>
-                  {player!.parseErrors.length} card{player!.parseErrors.length > 1 ? 's' : ''} not found
+                <div style={{ padding: '8px 12px', borderRadius: 8, background: 'oklch(22% .08 82/.15)', border: '1px solid oklch(73% .17 82/.2)', fontSize: 11, color: 'var(--c-gold)' }}>
+                  <div style={{ fontWeight: 600, marginBottom: 4 }}>
+                    {player!.parseErrors.length} card{player!.parseErrors.length > 1 ? 's' : ''} not found
+                  </div>
+                  <ul style={{ margin: 0, padding: '0 0 0 14px', display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    {player!.parseErrors.map((e, i) => (
+                      <li key={i} style={{ color: 'oklch(68% .13 82)', fontFamily: 'monospace', fontSize: 11 }}>{e.line}</li>
+                    ))}
+                  </ul>
                 </div>
               )}
 
