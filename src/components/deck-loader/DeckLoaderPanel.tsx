@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAppStore } from '@/store'
 import PlayerSlot from './PlayerSlot'
@@ -8,8 +8,11 @@ import { UserMenu } from '@/components/ui/user-menu'
 import { Scale, Zap, Library, Trophy } from 'lucide-react'
 import type { PlayerSeat } from '@/types/deck'
 import type { RoomPlayer } from '@/app/api/rooms/route'
+import { createClient } from '@/lib/supabase/client'
 
 const SEAT_NAMES = ['Alex', 'Sam', 'Jamie', 'Morgan']
+
+interface Profile { id: string; name: string }
 
 function StepDots({ current, total }: { current: number; total: number }) {
   return (
@@ -26,11 +29,92 @@ function StepDots({ current, total }: { current: number; total: number }) {
   )
 }
 
+function PlayerNameInput({
+  value,
+  placeholder,
+  accentColor,
+  profiles,
+  onChange,
+}: {
+  value: string
+  placeholder: string
+  accentColor: string
+  profiles: Profile[]
+  onChange: (v: string) => void
+}) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+
+  const filtered = profiles.filter(p =>
+    value.length === 0 || p.name.toLowerCase().includes(value.toLowerCase())
+  )
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [])
+
+  return (
+    <div ref={ref} style={{ position: 'relative' }}>
+      <input
+        className="mtg-input"
+        placeholder={placeholder}
+        value={value}
+        onChange={e => onChange(e.target.value)}
+        onFocus={() => profiles.length > 0 && setOpen(true)}
+        autoComplete="off"
+      />
+      {open && filtered.length > 0 && (
+        <div style={{
+          position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0, zIndex: 50,
+          background: 'var(--c-surface)', border: '1px solid var(--c-sub)',
+          borderRadius: 'var(--rad-lg)', overflow: 'hidden',
+          boxShadow: '0 8px 24px oklch(0% 0 0 / .3)',
+        }}>
+          {filtered.map(p => (
+            <button
+              key={p.id}
+              type="button"
+              onMouseDown={e => {
+                e.preventDefault()
+                onChange(p.name)
+                setOpen(false)
+              }}
+              style={{
+                width: '100%', display: 'flex', alignItems: 'center', gap: 10,
+                padding: '9px 12px', background: 'none', border: 'none',
+                cursor: 'pointer', textAlign: 'left',
+                transition: 'background 100ms',
+              }}
+              onMouseEnter={e => (e.currentTarget.style.background = 'var(--c-bg)')}
+              onMouseLeave={e => (e.currentTarget.style.background = 'none')}
+            >
+              <div style={{
+                width: 26, height: 26, borderRadius: '50%', flexShrink: 0,
+                background: 'var(--c-green-bg)', border: `1px solid ${accentColor}44`,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: 11, fontWeight: 700, color: accentColor,
+              }}>
+                {p.name[0].toUpperCase()}
+              </div>
+              <span style={{ fontSize: 14, color: 'var(--c-text)' }}>{p.name}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function DeckLoaderPanel() {
   const [step, setStep] = useState<1 | 2 | 3>(1)
   const [count, setCount] = useState(2)
   const [names, setNames] = useState(['', '', '', ''])
   const [expanded, setExpanded] = useState([false, false, false, false])
+  const [profiles, setProfiles] = useState<Profile[]>([])
 
   // Join room state
   const [joinCode, setJoinCode] = useState('')
@@ -47,6 +131,13 @@ export default function DeckLoaderPanel() {
   const preloadFromPod = useAppStore(s => s.preloadFromPod)
   const setRoomCode = useAppStore(s => s.setRoomCode)
   const router = useRouter()
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.from('profiles').select('id, name').order('name').then(({ data }) => {
+      if (data) setProfiles(data)
+    })
+  }, [])
 
   async function handleJoinRoom() {
     if (joinCode.length < 6) return
@@ -72,11 +163,16 @@ export default function DeckLoaderPanel() {
     }
   }
 
-  async function handleCreateRoom() {
+  async function handleCreateRoom(withDecks = false) {
     setCreatingRoom(true)
     setShareError('')
     try {
-      const payload: RoomPlayer[] = activePlayers.map(p => ({
+      const source = withDecks ? activePlayers : Array.from({ length: count }, (_, i) => {
+        const seat = (i + 1) as PlayerSeat
+        const name = names[i].trim() || SEAT_NAMES[i]
+        return { seat, name, commander: '', colors: [] as string[], deckRaw: '' }
+      })
+      const payload: RoomPlayer[] = source.map(p => ({
         seat: p.seat,
         name: p.name,
         commander: p.commander,
@@ -90,6 +186,7 @@ export default function DeckLoaderPanel() {
       })
       if (!res.ok) { setShareError('Failed to create room.'); return }
       const { code } = await res.json()
+      if (!withDecks) commitNames()
       setRoomCode(code)
       setMatchStartAt(Date.now())
       router.push('/match')
@@ -120,7 +217,6 @@ export default function DeckLoaderPanel() {
     setExpanded(prev => prev.map((v, i) => (i === idx ? !v : v)))
   }
 
-  const canStep1 = true
   const canStep3 = readyCount >= 2
 
   return (
@@ -172,18 +268,30 @@ export default function DeckLoaderPanel() {
                   <label style={{ display: 'block', fontSize: 11, fontWeight: 600, letterSpacing: '.18em', textTransform: 'uppercase', color: PLAYER_ACCENTS[i].c, marginBottom: 8 }}>
                     Player {i + 1}
                   </label>
-                  <input
-                    className="mtg-input"
-                    placeholder={`e.g. ${SEAT_NAMES[i]}`}
+                  <PlayerNameInput
                     value={names[i]}
-                    onChange={e => setNames(prev => prev.map((v, j) => j === i ? e.target.value : v))}
+                    placeholder={`e.g. ${SEAT_NAMES[i]}`}
+                    accentColor={PLAYER_ACCENTS[i].c}
+                    profiles={profiles}
+                    onChange={v => setNames(prev => prev.map((val, j) => j === i ? v : val))}
                   />
                 </div>
               ))}
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-              <button className="btn-gold" onClick={goToStep2} disabled={!canStep1}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 10 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <button
+                  className="btn-ghost"
+                  onClick={() => handleCreateRoom(false)}
+                  disabled={creatingRoom}
+                  style={{ fontSize: 13 }}
+                >
+                  {creatingRoom ? 'Creating…' : 'Create Room & Share →'}
+                </button>
+                {shareError && <span style={{ fontSize: 13, color: 'oklch(65% .2 25)' }}>{shareError}</span>}
+              </div>
+              <button className="btn-gold" onClick={goToStep2}>
                 Load the Lists <span style={{ opacity: .7 }}>→</span>
               </button>
             </div>
@@ -306,7 +414,7 @@ export default function DeckLoaderPanel() {
                 {shareError && <span style={{ fontSize: 13, color: 'oklch(65% .2 25)' }}>{shareError}</span>}
                 <button
                   className="btn-ghost"
-                  onClick={handleCreateRoom}
+                  onClick={() => handleCreateRoom(true)}
                   disabled={creatingRoom}
                   style={{ padding: '14px 24px', fontSize: 15 }}
                 >

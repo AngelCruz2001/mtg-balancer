@@ -1,8 +1,12 @@
+'use client'
+import { useState } from 'react'
 import type { Player } from '@/types/deck'
 import { ColorPips } from '@/components/ui/color-pips'
 import { ManaCurve } from '@/components/ui/mana-curve'
 import { PLAYER_ACCENTS } from '@/lib/design'
 import type { DeckCard } from '@/types/card'
+import { useAppStore } from '@/store'
+import type { RoomPlayer } from '@/app/api/rooms/route'
 
 function groupCards(cards: DeckCard[]) {
   const typeOrder = ['Planeswalker', 'Creature', 'Instant', 'Sorcery', 'Enchantment', 'Artifact', 'Land', 'Other']
@@ -40,8 +44,37 @@ function CardSection({ group }: { group: { l: string; n: number; names: string[]
   )
 }
 
+async function patchRoom(roomCode: string) {
+  const players = useAppStore.getState().players
+  const payload: RoomPlayer[] = players.map(p => ({
+    seat: p.seat,
+    name: p.name,
+    commander: p.commander,
+    colors: p.colors,
+    deck_raw: p.deckRaw,
+  }))
+  await fetch(`/api/rooms/${roomCode}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ players: payload }),
+  })
+}
+
 export default function PlayerZone({ player, idx }: { player: Player; idx: number }) {
   const acc = PLAYER_ACCENTS[idx]
+  const loadDeck = useAppStore(s => s.loadDeck)
+  const roomCode = useAppStore(s => s.roomCode)
+  const [deckInput, setDeckInput] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+
+  async function handleLoadDeck() {
+    if (!deckInput.trim()) return
+    setSubmitting(true)
+    await loadDeck(player.seat, deckInput)
+    if (roomCode) await patchRoom(roomCode)
+    setSubmitting(false)
+  }
+
   const total = player.cards.reduce((s, dc) => s + dc.quantity, 0)
   const lands = player.cards.filter(dc => dc.card.type_line?.includes('Land')).reduce((s, dc) => s + dc.quantity, 0)
   const spells = total - lands
@@ -49,7 +82,6 @@ export default function PlayerZone({ player, idx }: { player: Player; idx: numbe
   const avgCmc = nonLands.length > 0
     ? (nonLands.reduce((s, dc) => s + dc.card.cmc * dc.quantity, 0) / nonLands.reduce((s, dc) => s + dc.quantity, 0)).toFixed(1)
     : '0.0'
-
   const deckPrice = player.cards.reduce((s, dc) => s + (dc.card.prices?.usd ? parseFloat(dc.card.prices.usd) : 0) * dc.quantity, 0)
 
   const curve = Array(8).fill(0)
@@ -60,6 +92,65 @@ export default function PlayerZone({ player, idx }: { player: Player; idx: numbe
 
   const groups = groupCards(player.cards)
 
+  // Header is always shown
+  const header = (
+    <div style={{ padding: '16px 18px', borderBottom: '1px solid var(--c-sub)' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div>
+          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '.22em', textTransform: 'uppercase', color: acc.c, marginBottom: 5 }}>Seat {player.seat}</div>
+          <div style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-.01em', lineHeight: 1 }}>{player.name}</div>
+        </div>
+        {player.cards.length > 0 && (
+          <div style={{ textAlign: 'right' }}>
+            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.15em', textTransform: 'uppercase', color: 'var(--c-text3)', marginBottom: 4 }}>Deck Size</div>
+            <div style={{ fontFamily: 'monospace', fontSize: 22, color: 'var(--c-text)' }}>{total}</div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+
+  // Empty / loading state
+  if (player.loading) {
+    return (
+      <div className="mtg-card" style={{ display: 'flex', flexDirection: 'column', borderTop: `2px solid ${acc.c}88`, overflow: 'hidden' }}>
+        {header}
+        <div style={{ padding: '32px 18px', textAlign: 'center' }}>
+          <div style={{ fontSize: 12, color: 'var(--c-text3)', letterSpacing: '.1em', textTransform: 'uppercase' }}>Loading deck…</div>
+        </div>
+      </div>
+    )
+  }
+
+  if (player.cards.length === 0) {
+    return (
+      <div className="mtg-card" style={{ display: 'flex', flexDirection: 'column', borderTop: `2px solid ${acc.c}44`, overflow: 'hidden' }}>
+        {header}
+        <div style={{ padding: '18px' }}>
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.15em', textTransform: 'uppercase', color: 'var(--c-text3)', marginBottom: 10 }}>
+            Waiting for deck
+          </div>
+          <textarea
+            className="mtg-input"
+            placeholder={`Paste ${player.name}'s decklist here…`}
+            value={deckInput}
+            onChange={e => setDeckInput(e.target.value)}
+            style={{ width: '100%', minHeight: 130, resize: 'vertical', fontFamily: 'monospace', fontSize: 12, boxSizing: 'border-box' }}
+          />
+          <button
+            className="btn-gold"
+            onClick={handleLoadDeck}
+            disabled={!deckInput.trim() || submitting}
+            style={{ marginTop: 8, width: '100%' }}
+          >
+            {submitting ? 'Loading…' : 'Load Deck'}
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  // Full deck view
   return (
     <div className="mtg-card" style={{ display: 'flex', flexDirection: 'column', borderTop: `2px solid ${acc.c}88`, overflow: 'hidden' }}>
       <div style={{ padding: '16px 18px', borderBottom: '1px solid var(--c-sub)' }}>
@@ -74,13 +165,11 @@ export default function PlayerZone({ player, idx }: { player: Player; idx: numbe
           </div>
         </div>
 
-        {/* Commander art */}
         {(() => {
           const cmdCard = player.commander
             ? player.cards.find(dc => dc.card.name.toLowerCase() === player.commander.toLowerCase())?.card
             : undefined
-          const artUrl = cmdCard?.image_uris?.art_crop
-            ?? cmdCard?.card_faces?.[0]?.image_uris?.art_crop
+          const artUrl = cmdCard?.image_uris?.art_crop ?? cmdCard?.card_faces?.[0]?.image_uris?.art_crop
           return (
             <div style={{
               height: 90, borderRadius: 10, overflow: 'hidden', position: 'relative', marginBottom: 14,

@@ -39,8 +39,8 @@ export default function MatchPage() {
   const elapsed = useElapsed(matchStartAt)
 
   useEffect(() => {
-    if (ready.length < 2) router.replace('/')
-  }, [ready.length, router])
+    if (players.length < 2) router.replace('/')
+  }, [players.length, router])
 
   useEffect(() => {
     if (!matchStartAt) setMatchStartAt(Date.now())
@@ -69,13 +69,13 @@ export default function MatchPage() {
     return () => { supabase.removeChannel(channel) }
   }, [roomCode, preloadFromPod])
 
-  if (ready.length < 2) return null
+  if (players.length < 2) return null
 
   return (
     <>
       <div className="afu" style={{ overflowX: 'hidden' }}>
         <MatchNav
-          playerCount={ready.length}
+          playerCount={players.length}
           elapsed={elapsed}
           roomCode={roomCode}
           onBack={() => router.push('/')}
@@ -83,9 +83,9 @@ export default function MatchPage() {
           onHistory={() => setShowHistory(true)}
         />
         <div style={{ maxWidth: 1360, margin: '0 auto', padding: '0 24px 48px' }}>
-          <MatchTable players={ready} />
-          <AnalyzerPanel players={ready} />
-          <SaveDecksPanel players={ready} />
+          <MatchTable players={players} />
+          {ready.length >= 2 && <AnalyzerPanel players={ready} />}
+          {ready.length >= 2 && <SaveDecksPanel players={ready} />}
         </div>
 
         {/* Rules Judge FAB */}
