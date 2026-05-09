@@ -1,6 +1,3 @@
--- Full schema — apply this to a brand-new Supabase project to recreate everything.
--- For incremental changes on an existing DB, run files in supabase/migrations/ in order instead.
-
 -- ── Profiles ──────────────────────────────────────────────────────────────
 CREATE TABLE public.profiles (
   id         uuid REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
@@ -83,17 +80,14 @@ CREATE POLICY "Users can insert match_players for their own matches"
 
 -- ── Deck Library ──────────────────────────────────────────────────────────
 CREATE TABLE public.decks (
-  id              uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-  name            text NOT NULL,
-  commander       text,
-  colors          text[],
-  moxfield_url    text,
-  deck_raw        text NOT NULL,
-  bracket         integer CHECK (bracket BETWEEN 1 AND 4),
-  description     text,
-  estimated_value numeric(10,2),
-  created_by      uuid REFERENCES public.profiles(id) ON DELETE SET NULL,
-  created_at      timestamptz DEFAULT now() NOT NULL
+  id           uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  name         text NOT NULL,
+  commander    text,
+  colors       text[],
+  moxfield_url text,
+  deck_raw     text NOT NULL,
+  created_by   uuid REFERENCES public.profiles(id) ON DELETE SET NULL,
+  created_at   timestamptz DEFAULT now() NOT NULL
 );
 
 ALTER TABLE public.decks ENABLE ROW LEVEL SECURITY;
@@ -109,39 +103,3 @@ CREATE POLICY "Users can update their own decks"
 
 CREATE POLICY "Users can delete their own decks"
   ON public.decks FOR DELETE TO authenticated USING (auth.uid() = created_by);
-
--- ── Wins by commander (used by deck library) ───────────────────────────────
-CREATE OR REPLACE FUNCTION public.get_wins_by_commander()
-RETURNS TABLE(commander text, wins bigint)
-LANGUAGE sql SECURITY DEFINER AS $$
-  SELECT mp.commander, COUNT(*) AS wins
-  FROM public.match_players mp
-  JOIN public.matches m ON m.id = mp.match_id
-  WHERE m.winner_seat = mp.seat
-    AND mp.commander IS NOT NULL
-  GROUP BY mp.commander;
-$$;
-
--- ── Rooms (shared match sessions) ─────────────────────────────────────────
-CREATE TABLE public.rooms (
-  id          uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-  code        text UNIQUE NOT NULL,
-  players     jsonb NOT NULL DEFAULT '[]',
-  created_by  uuid REFERENCES auth.users(id) ON DELETE SET NULL,
-  created_at  timestamptz DEFAULT now() NOT NULL
-);
-
-ALTER TABLE public.rooms ENABLE ROW LEVEL SECURITY;
-
--- No auth required — the room code itself acts as the access token
-CREATE POLICY "Anyone can create rooms"
-  ON public.rooms FOR INSERT WITH CHECK (true);
-
-CREATE POLICY "Anyone can view rooms"
-  ON public.rooms FOR SELECT USING (true);
-
-CREATE POLICY "Anyone can update rooms"
-  ON public.rooms FOR UPDATE USING (true);
-
--- Enable Realtime so guests receive live deck updates
-ALTER PUBLICATION supabase_realtime ADD TABLE public.rooms;

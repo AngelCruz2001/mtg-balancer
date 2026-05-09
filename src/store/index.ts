@@ -14,13 +14,16 @@ interface AppState {
   players: Player[]
   balanceReport: AnalysisReport | null
   matchStartAt: number | null
+  roomCode: string | null
   addPlayer: (seat: PlayerSeat, name: string) => void
   updatePlayer: (seat: PlayerSeat, patch: Partial<Player>) => void
   loadDeck: (seat: PlayerSeat, raw: string) => Promise<void>
   resolveCard: (seat: PlayerSeat, errorLine: string, correctedLine: string) => Promise<string | null>
+  setPlayerCards: (seat: PlayerSeat, cards: import('@/types/card').DeckCard[]) => void
   clearPlayer: (seat: PlayerSeat) => void
   setBalanceReport: (report: AnalysisReport) => void
   setMatchStartAt: (ts: number) => void
+  setRoomCode: (code: string | null) => void
   preloadFromPod: (decks: PodDeck[]) => Promise<void>
 }
 
@@ -32,6 +35,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
   players: [],
   balanceReport: null,
   matchStartAt: null,
+  roomCode: null,
 
   addPlayer: (seat, name) => {
     const existing = get().players.find(p => p.seat === seat)
@@ -81,12 +85,17 @@ export const useAppStore = create<AppState>()((set, get) => ({
     }
   },
 
+  setPlayerCards: (seat, cards) => {
+    set(s => ({ players: s.players.map(p => p.seat === seat ? { ...p, cards } : p) }))
+  },
+
   clearPlayer: (seat) => {
     set(s => ({ players: s.players.map(p => p.seat === seat ? emptyPlayer(seat, p.name) : p) }))
   },
 
   setBalanceReport: (report) => set({ balanceReport: report }),
   setMatchStartAt: (ts) => set({ matchStartAt: ts }),
+  setRoomCode: (code) => set({ roomCode: code }),
 
   preloadFromPod: async (decks) => {
     const initial = decks.map((d, i) => ({

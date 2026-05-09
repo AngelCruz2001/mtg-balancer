@@ -6,7 +6,8 @@ import type { AnalysisReport } from '@/types/analysis'
 import type { SaveMatchPayload } from '@/types/match'
 import { PLAYER_ACCENTS } from '@/lib/design'
 import BalanceReport from './BalanceReport'
-import { Check, Scale } from 'lucide-react'
+import { Check, Scale, Library } from 'lucide-react'
+import SaveToLibraryForm from '@/components/shared/SaveToLibraryForm'
 
 const LOADING_MSGS = [
   'Mapping synergy vectors…',
@@ -162,6 +163,32 @@ function SaveMatchForm({ report, players }: { report: AnalysisReport; players: P
       >
         {saving ? <><div className="spinner" style={{ width: 14, height: 14 }} /> Saving…</> : 'Save Match'}
       </button>
+    </div>
+  )
+}
+
+export function SaveDecksPanel({ players }: { players: Player[] }) {
+  return (
+    <div className="mtg-panel" style={{ padding: '24px 32px', marginTop: 16 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 18 }}>
+        <Library size={16} style={{ color: 'var(--c-gold)' }} />
+        <span className="kicker">Save Decks to Library</span>
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        {players.map(p => (
+          <div key={p.seat} style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+            <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--c-text2)', minWidth: 90 }}>{p.name}</span>
+            {p.commander && (
+              <span style={{ fontSize: 11, color: 'var(--c-text3)', flex: 1 }}>{p.commander}</span>
+            )}
+            <SaveToLibraryForm
+              deckRaw={p.deckRaw}
+              commander={p.commander}
+              colors={p.colors}
+            />
+          </div>
+        ))}
+      </div>
     </div>
   )
 }

@@ -1,20 +1,33 @@
 import type { Player } from '@/types/deck'
 import PlayerZone from './PlayerZone'
-import { Scale, Timer, Search, History } from 'lucide-react'
+import { Scale, Timer, Search, History, Copy, Check } from 'lucide-react'
+import { useState } from 'react'
 
 export function MatchNav({
   playerCount,
   elapsed,
+  roomCode,
   onBack,
   onLookup,
   onHistory,
 }: {
   playerCount: number
   elapsed: string
+  roomCode?: string | null
   onBack: () => void
   onLookup: () => void
   onHistory: () => void
 }) {
+  const [copied, setCopied] = useState(false)
+
+  function copyCode() {
+    if (!roomCode) return
+    navigator.clipboard.writeText(roomCode).then(() => {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    })
+  }
+
   return (
     <header style={{
       height: 58, background: 'var(--c-surface)', borderBottom: '1px solid var(--c-sub)',
@@ -29,6 +42,23 @@ export function MatchNav({
           <span style={{ fontWeight: 600, fontSize: 14 }}>Deck Balancer</span>
         </div>
         <span className="badge-muted" style={{ fontSize: 10 }}>{playerCount} players</span>
+        {roomCode && (
+          <button
+            onClick={copyCode}
+            title="Copy room code"
+            style={{
+              display: 'flex', alignItems: 'center', gap: 5,
+              padding: '4px 10px', borderRadius: 'var(--rad)',
+              background: 'var(--c-green-bg)', border: '1px solid oklch(57% .205 162 / .35)',
+              color: 'var(--c-green-hi)', fontSize: 12, fontWeight: 700,
+              letterSpacing: '.14em', cursor: 'pointer', fontFamily: 'monospace',
+              transition: 'opacity 150ms',
+            }}
+          >
+            {copied ? <Check size={11} /> : <Copy size={11} />}
+            {roomCode}
+          </button>
+        )}
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>

@@ -6,7 +6,9 @@ import { ColorPicker } from '@/components/ui/color-picker'
 import type { PlayerSeat } from '@/types/deck'
 import type { SavedDeck } from '@/types/match'
 import { PLAYER_ACCENTS, DEMO_LISTS } from '@/lib/design'
-import { Check, Library, X, ClipboardList, Link, RotateCcw } from 'lucide-react'
+import { Check, X, ClipboardList, Link, Library, RotateCcw, Scissors } from 'lucide-react'
+import SaveToLibraryForm from '@/components/shared/SaveToLibraryForm'
+import DeckTrimmerModal from '@/components/modals/DeckTrimmerModal'
 
 type LoadMode = 'paste' | 'moxfield' | 'library'
 
@@ -105,54 +107,6 @@ function CardErrorRow({ seat, errorLine }: { seat: PlayerSeat; errorLine: string
   )
 }
 
-function SaveToLibraryForm({ deckRaw, commander, colors, moxfieldUrl }: { deckRaw: string; commander: string; colors: string[]; moxfieldUrl?: string }) {
-  const [open, setOpen] = useState(false)
-  const [name, setName] = useState('')
-  const [saving, setSaving] = useState(false)
-  const [saved, setSaved] = useState(false)
-  const [err, setErr] = useState<string | null>(null)
-
-  if (saved) return <span style={{ fontSize: 12, color: 'var(--c-green-hi)', display: 'inline-flex', alignItems: 'center', gap: 5 }}><Check size={12} /> Saved to library</span>
-
-  if (!open) {
-    return (
-      <button className="btn-ghost" style={{ fontSize: 12, padding: '5px 10px' }} onClick={() => { setName(commander || 'New Deck'); setOpen(true) }}>
-        <Library size={12} /> Save to Library
-      </button>
-    )
-  }
-
-  async function save() {
-    if (!name.trim()) return
-    setSaving(true); setErr(null)
-    const res = await fetch('/api/decks', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: name.trim(), commander: commander || null, colors, moxfield_url: moxfieldUrl || null, deck_raw: deckRaw }),
-    })
-    const data = await res.json()
-    if (!res.ok) { setErr(data.error); setSaving(false) } else setSaved(true)
-  }
-
-  return (
-    <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
-      <input
-        className="mtg-input"
-        value={name}
-        onChange={e => setName(e.target.value)}
-        placeholder="Deck name…"
-        style={{ fontSize: 12, padding: '5px 10px', flex: 1, minWidth: 120 }}
-        autoFocus
-      />
-      <button className="btn-primary" style={{ fontSize: 12, padding: '5px 12px' }} onClick={save} disabled={!name.trim() || saving}>
-        {saving ? '…' : 'Save'}
-      </button>
-      <button className="btn-ghost" style={{ fontSize: 12, padding: '5px 8px' }} onClick={() => setOpen(false)}>✕</button>
-      {err && <div style={{ width: '100%', fontSize: 11, color: 'oklch(68% .18 20)' }}>{err}</div>}
-    </div>
-  )
-}
-
 function LibraryPicker({ onSelect }: { onSelect: (deck: SavedDeck) => void }) {
   const [decks, setDecks] = useState<SavedDeck[]>([])
   const [loading, setLoading] = useState(true)
@@ -206,8 +160,10 @@ export default function PlayerSlot({ seat, idx, expanded, onToggleExpand }: Play
   const updatePlayer = useAppStore(s => s.updatePlayer)
   const loadDeck = useAppStore(s => s.loadDeck)
   const clearPlayer = useAppStore(s => s.clearPlayer)
+  const setPlayerCards = useAppStore(s => s.setPlayerCards)
 
   const [mode, setMode] = useState<LoadMode>('paste')
+  const [trimmerOpen, setTrimmerOpen] = useState(false)
   const [moxfieldUrl, setMoxfieldUrl] = useState('')
   const [moxfieldLoading, setMoxfieldLoading] = useState(false)
   const [moxfieldError, setMoxfieldError] = useState<string | null>(null)
@@ -294,7 +250,11 @@ export default function PlayerSlot({ seat, idx, expanded, onToggleExpand }: Play
           </div>
           <span style={{ fontWeight: 600, fontSize: 15 }}>{player?.name || `Player ${idx + 1}`}</span>
         </div>
-        {isLoaded && <span className="badge-green" style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><Check size={11} /> {totalCards} cards</span>}
+        {isLoaded && (
+          totalCards === 100
+            ? <span className="badge-green" style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><Check size={11} /> {totalCards} cards</span>
+            : <span className="badge-red" style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>{totalCards} cards · need 100</span>
+        )}
         {isLoading && <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--c-text3)' }}><div className="spinner" style={{ width: 14, height: 14 }} /> Resolving…</span>}
       </div>
 
@@ -337,6 +297,16 @@ export default function PlayerSlot({ seat, idx, expanded, onToggleExpand }: Play
                 ))}
               </ul>
             </div>
+          )}
+
+          {totalCards !== 100 && (
+            <button
+              className="btn-ghost"
+              style={{ fontSize: 12, padding: '7px 14px', borderColor: 'oklch(60% .22 20/.4)', color: 'oklch(68% .18 20)' }}
+              onClick={() => setTrimmerOpen(true)}
+            >
+              <Scissors size={12} /> Trim to 100 cards
+            </button>
           )}
 
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 6 }}>
@@ -442,6 +412,17 @@ export default function PlayerSlot({ seat, idx, expanded, onToggleExpand }: Play
             <LibraryPicker onSelect={handleLibrarySelect} />
           )}
         </>
+      )}
+
+      {trimmerOpen && player?.cards && (
+        <DeckTrimmerModal
+          cards={player.cards}
+          onClose={() => setTrimmerOpen(false)}
+          onConfirm={trimmed => {
+            setPlayerCards(seat, trimmed)
+            setTrimmerOpen(false)
+          }}
+        />
       )}
     </div>
   )

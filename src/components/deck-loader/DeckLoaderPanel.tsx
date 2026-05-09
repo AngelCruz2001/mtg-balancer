@@ -7,6 +7,7 @@ import { PLAYER_ACCENTS } from '@/lib/design'
 import { UserMenu } from '@/components/ui/user-menu'
 import { Scale, Zap, Library, Trophy } from 'lucide-react'
 import type { PlayerSeat } from '@/types/deck'
+import type { RoomPlayer } from '@/app/api/rooms/route'
 
 const SEAT_NAMES = ['Alex', 'Sam', 'Jamie', 'Morgan']
 
@@ -31,10 +32,73 @@ export default function DeckLoaderPanel() {
   const [names, setNames] = useState(['', '', '', ''])
   const [expanded, setExpanded] = useState([false, false, false, false])
 
+  // Join room state
+  const [joinCode, setJoinCode] = useState('')
+  const [joinError, setJoinError] = useState('')
+  const [joining, setJoining] = useState(false)
+
+  // Share room state
+  const [creatingRoom, setCreatingRoom] = useState(false)
+  const [shareError, setShareError] = useState('')
+
   const players = useAppStore(s => s.players)
   const addPlayer = useAppStore(s => s.addPlayer)
   const setMatchStartAt = useAppStore(s => s.setMatchStartAt)
+  const preloadFromPod = useAppStore(s => s.preloadFromPod)
+  const setRoomCode = useAppStore(s => s.setRoomCode)
   const router = useRouter()
+
+  async function handleJoinRoom() {
+    if (joinCode.length < 6) return
+    setJoining(true)
+    setJoinError('')
+    try {
+      const res = await fetch(`/api/rooms/${joinCode}`)
+      if (!res.ok) { setJoinError('Room not found. Check the code and try again.'); return }
+      const data = await res.json()
+      const roomPlayers: RoomPlayer[] = data.players
+      await preloadFromPod(roomPlayers.map(p => ({
+        name: p.name,
+        commander: p.commander,
+        colors: p.colors,
+        deck_raw: p.deck_raw,
+      })))
+      setRoomCode(joinCode.toUpperCase())
+      router.push('/match')
+    } catch {
+      setJoinError('Failed to join room. Please try again.')
+    } finally {
+      setJoining(false)
+    }
+  }
+
+  async function handleCreateRoom() {
+    setCreatingRoom(true)
+    setShareError('')
+    try {
+      const payload: RoomPlayer[] = activePlayers.map(p => ({
+        seat: p.seat,
+        name: p.name,
+        commander: p.commander,
+        colors: p.colors,
+        deck_raw: p.deckRaw,
+      }))
+      const res = await fetch('/api/rooms', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ players: payload }),
+      })
+      if (!res.ok) { setShareError('Failed to create room.'); return }
+      const { code } = await res.json()
+      setRoomCode(code)
+      setMatchStartAt(Date.now())
+      router.push('/match')
+    } catch {
+      setShareError('Failed to create room. Please try again.')
+    } finally {
+      setCreatingRoom(false)
+    }
+  }
 
   const activePlayers = players.filter(p => (p.cards.length > 0) && p.seat <= count)
   const readyCount = activePlayers.length
@@ -123,6 +187,35 @@ export default function DeckLoaderPanel() {
                 Load the Lists <span style={{ opacity: .7 }}>→</span>
               </button>
             </div>
+
+            {/* Join an existing room */}
+            <div style={{ maxWidth: 480 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
+                <div style={{ flex: 1, height: 1, background: 'var(--c-sub)' }} />
+                <span style={{ fontSize: 11, color: 'var(--c-text3)', letterSpacing: '.12em', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>or join a room</span>
+                <div style={{ flex: 1, height: 1, background: 'var(--c-sub)' }} />
+              </div>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <input
+                  className="mtg-input"
+                  placeholder="Enter room code"
+                  value={joinCode}
+                  onChange={e => { setJoinCode(e.target.value.toUpperCase()); setJoinError('') }}
+                  onKeyDown={e => e.key === 'Enter' && handleJoinRoom()}
+                  maxLength={6}
+                  style={{ flex: 1, letterSpacing: '.18em', fontWeight: 700, textTransform: 'uppercase' }}
+                />
+                <button
+                  className="btn-ghost"
+                  onClick={handleJoinRoom}
+                  disabled={joinCode.length < 6 || joining}
+                  style={{ whiteSpace: 'nowrap' }}
+                >
+                  {joining ? 'Joining…' : 'Join →'}
+                </button>
+              </div>
+              {joinError && <p style={{ color: 'oklch(65% .2 25)', fontSize: 13, marginTop: 8 }}>{joinError}</p>}
+            </div>
           </div>
         )}
 
@@ -207,11 +300,26 @@ export default function DeckLoaderPanel() {
               })}
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
               <button className="btn-ghost" onClick={() => setStep(2)}>← Back</button>
-              <button className="btn-gold" onClick={() => { setMatchStartAt(Date.now()); router.push('/match') }} style={{ padding: '14px 36px', fontSize: 16 }}>
-                Launch Match →
-              </button>
+              <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+                {shareError && <span style={{ fontSize: 13, color: 'oklch(65% .2 25)' }}>{shareError}</span>}
+                <button
+                  className="btn-ghost"
+                  onClick={handleCreateRoom}
+                  disabled={creatingRoom}
+                  style={{ padding: '14px 24px', fontSize: 15 }}
+                >
+                  {creatingRoom ? 'Creating room…' : 'Share Room'}
+                </button>
+                <button
+                  className="btn-gold"
+                  onClick={() => { setMatchStartAt(Date.now()); router.push('/match') }}
+                  style={{ padding: '14px 36px', fontSize: 16 }}
+                >
+                  Launch Match →
+                </button>
+              </div>
             </div>
           </div>
         )}
