@@ -62,11 +62,11 @@ export function MatchNav({
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <div style={{ padding: '5px 12px', borderRadius: 'var(--rad)', background: 'var(--c-bg)', border: '1px solid var(--c-sub)', fontSize: 13, fontWeight: 600, color: 'var(--c-text2)', fontVariantNumeric: 'tabular-nums', letterSpacing: '.02em' }}>
+        <div title="Elapsed time since the match started" style={{ padding: '5px 12px', borderRadius: 'var(--rad)', background: 'var(--c-bg)', border: '1px solid var(--c-sub)', fontSize: 13, fontWeight: 600, color: 'var(--c-text2)', fontVariantNumeric: 'tabular-nums', letterSpacing: '.02em', display: 'flex', alignItems: 'center', gap: 5 }}>
           <Timer size={13} /> {elapsed}
         </div>
-        <button className="btn-ghost" style={{ fontSize: 12, padding: '7px 12px' }} onClick={onLookup}><Search size={13} /> Card Lookup</button>
-        <button className="btn-ghost" style={{ fontSize: 12, padding: '7px 12px' }} onClick={onHistory}><History size={13} /> History</button>
+        <button className="btn-ghost" title="Look up a card by name" style={{ fontSize: 12, padding: '7px 12px' }} onClick={onLookup}><Search size={13} /> Card Lookup</button>
+        <button className="btn-ghost" title="View past match results" style={{ fontSize: 12, padding: '7px 12px' }} onClick={onHistory}><History size={13} /> History</button>
       </div>
     </header>
   )

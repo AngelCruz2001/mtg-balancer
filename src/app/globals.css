@@ -181,3 +181,26 @@ body.theme-obsidian {
 }
 
 .btn-glow { animation: mtg-glow 2s ease infinite; }
+
+/* Keyboard focus indicators */
+.btn-primary:focus-visible,
+.btn-gold:focus-visible,
+.btn-ghost:focus-visible,
+.btn-icon:focus-visible {
+  outline: 2px solid var(--c-green);
+  outline-offset: 2px;
+}
+.mtg-input:focus-visible,
+.mtg-textarea:focus-visible {
+  outline: none; /* already has box-shadow ring */
+}
+button:focus-visible:not(.btn-primary):not(.btn-gold):not(.btn-ghost):not(.btn-icon) {
+  outline: 2px solid var(--c-green);
+  outline-offset: 2px;
+}
+
+/* Subtle hover state on help-cursor elements */
+[title][style*="cursor: help"]:hover,
+[title]:not(button):not(a)[style*="cursor:help"]:hover {
+  filter: brightness(1.08);
+}

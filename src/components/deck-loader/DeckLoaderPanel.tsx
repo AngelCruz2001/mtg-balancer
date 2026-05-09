@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect, useRef } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAppStore } from '@/store'
 import PlayerSlot from './PlayerSlot'
@@ -8,11 +8,9 @@ import { UserMenu } from '@/components/ui/user-menu'
 import { Scale, Zap, Library, Trophy } from 'lucide-react'
 import type { PlayerSeat } from '@/types/deck'
 import type { RoomPlayer } from '@/app/api/rooms/route'
-import { createClient } from '@/lib/supabase/client'
+import PlayerNameInput from '@/components/shared/PlayerNameInput'
 
 const SEAT_NAMES = ['Alex', 'Sam', 'Jamie', 'Morgan']
-
-interface Profile { id: string; name: string }
 
 function StepDots({ current, total }: { current: number; total: number }) {
   return (
@@ -29,92 +27,11 @@ function StepDots({ current, total }: { current: number; total: number }) {
   )
 }
 
-function PlayerNameInput({
-  value,
-  placeholder,
-  accentColor,
-  profiles,
-  onChange,
-}: {
-  value: string
-  placeholder: string
-  accentColor: string
-  profiles: Profile[]
-  onChange: (v: string) => void
-}) {
-  const [open, setOpen] = useState(false)
-  const ref = useRef<HTMLDivElement>(null)
-
-  const filtered = profiles.filter(p =>
-    value.length === 0 || p.name.toLowerCase().includes(value.toLowerCase())
-  )
-
-  useEffect(() => {
-    function handleClick(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
-    }
-    document.addEventListener('mousedown', handleClick)
-    return () => document.removeEventListener('mousedown', handleClick)
-  }, [])
-
-  return (
-    <div ref={ref} style={{ position: 'relative' }}>
-      <input
-        className="mtg-input"
-        placeholder={placeholder}
-        value={value}
-        onChange={e => onChange(e.target.value)}
-        onFocus={() => profiles.length > 0 && setOpen(true)}
-        autoComplete="off"
-      />
-      {open && filtered.length > 0 && (
-        <div style={{
-          position: 'absolute', top: 'calc(100% + 4px)', left: 0, right: 0, zIndex: 50,
-          background: 'var(--c-surface)', border: '1px solid var(--c-sub)',
-          borderRadius: 'var(--rad-lg)', overflow: 'hidden',
-          boxShadow: '0 8px 24px oklch(0% 0 0 / .3)',
-        }}>
-          {filtered.map(p => (
-            <button
-              key={p.id}
-              type="button"
-              onMouseDown={e => {
-                e.preventDefault()
-                onChange(p.name)
-                setOpen(false)
-              }}
-              style={{
-                width: '100%', display: 'flex', alignItems: 'center', gap: 10,
-                padding: '9px 12px', background: 'none', border: 'none',
-                cursor: 'pointer', textAlign: 'left',
-                transition: 'background 100ms',
-              }}
-              onMouseEnter={e => (e.currentTarget.style.background = 'var(--c-bg)')}
-              onMouseLeave={e => (e.currentTarget.style.background = 'none')}
-            >
-              <div style={{
-                width: 26, height: 26, borderRadius: '50%', flexShrink: 0,
-                background: 'var(--c-green-bg)', border: `1px solid ${accentColor}44`,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 11, fontWeight: 700, color: accentColor,
-              }}>
-                {p.name[0].toUpperCase()}
-              </div>
-              <span style={{ fontSize: 14, color: 'var(--c-text)' }}>{p.name}</span>
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  )
-}
-
 export default function DeckLoaderPanel() {
   const [step, setStep] = useState<1 | 2 | 3>(1)
   const [count, setCount] = useState(2)
   const [names, setNames] = useState(['', '', '', ''])
   const [expanded, setExpanded] = useState([false, false, false, false])
-  const [profiles, setProfiles] = useState<Profile[]>([])
 
   // Join room state
   const [joinCode, setJoinCode] = useState('')
@@ -131,13 +48,6 @@ export default function DeckLoaderPanel() {
   const preloadFromPod = useAppStore(s => s.preloadFromPod)
   const setRoomCode = useAppStore(s => s.setRoomCode)
   const router = useRouter()
-
-  useEffect(() => {
-    const supabase = createClient()
-    supabase.from('profiles').select('id, name').order('name').then(({ data }) => {
-      if (data) setProfiles(data)
-    })
-  }, [])
 
   async function handleJoinRoom() {
     if (joinCode.length < 6) return
@@ -272,7 +182,6 @@ export default function DeckLoaderPanel() {
                     value={names[i]}
                     placeholder={`e.g. ${SEAT_NAMES[i]}`}
                     accentColor={PLAYER_ACCENTS[i].c}
-                    profiles={profiles}
                     onChange={v => setNames(prev => prev.map((val, j) => j === i ? v : val))}
                   />
                 </div>
@@ -285,6 +194,7 @@ export default function DeckLoaderPanel() {
                   className="btn-ghost"
                   onClick={() => handleCreateRoom(false)}
                   disabled={creatingRoom}
+                  title="Generate a 6-character room code so other players can join and load their own decklists"
                   style={{ fontSize: 13 }}
                 >
                   {creatingRoom ? 'Creating…' : 'Create Room & Share →'}
@@ -358,7 +268,12 @@ export default function DeckLoaderPanel() {
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <button className="btn-ghost" onClick={() => setStep(1)}>← Back</button>
-              <button className="btn-gold" onClick={() => setStep(3)} disabled={!canStep3}>
+              <button
+                className="btn-gold"
+                onClick={() => setStep(3)}
+                disabled={!canStep3}
+                title={!canStep3 ? `Load at least 2 decklists to continue (${readyCount}/${count} ready)` : 'Review the pod before launching'}
+              >
                 Review Pod <span style={{ opacity: .7 }}>→</span>
               </button>
             </div>

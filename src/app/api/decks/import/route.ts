@@ -78,7 +78,7 @@ async function fromArchidekt(deckId: string): Promise<ImportResult> {
   const data = await res.json()
 
   type ArchidektCard = {
-    qty: number
+    quantity: number
     card: { oracleCard: { name: string; colorIdentity?: string[] } }
     categories: string[]
   }
@@ -87,7 +87,7 @@ async function fromArchidekt(deckId: string): Promise<ImportResult> {
   const commanderCard = cards.find(c => c.categories?.some((cat: string) => cat.toLowerCase() === 'commander'))
   const lines = cards
     .filter(c => !c.categories?.some((cat: string) => ['sideboard', 'maybeboard'].includes(cat.toLowerCase())))
-    .map(c => `${c.qty} ${c.card.oracleCard.name}`)
+    .map(c => `${c.quantity} ${c.card.oracleCard.name}`)
 
   return {
     raw: lines.join('\n'),

@@ -1,4 +1,11 @@
 const AXES = ['Power', 'Speed', 'Resilience', 'Interaction', 'Synergy']
+const AXIS_DESCRIPTIONS: Record<string, string> = {
+  Power: 'Raw card strength and win conditions',
+  Speed: 'How fast the deck can execute its gameplan',
+  Resilience: 'Ability to recover from removal and board wipes',
+  Interaction: 'Counterspells, removal, and disruption',
+  Synergy: 'How well cards work together as a package',
+}
 const PLAYER_COLORS = [
   'oklch(65% 0.22 162)',
   'oklch(72% 0.17 82)',
@@ -36,7 +43,9 @@ export function RadarChart({
       ))}
       {labels.map(({ ax, p: [x, y] }) => (
         <text key={ax} x={x} y={y} textAnchor="middle" dominantBaseline="middle"
-          fill="oklch(50% 0.020 160)" fontSize={11} fontFamily="Outfit" fontWeight={500} letterSpacing="0.03em">
+          fill="oklch(50% 0.020 160)" fontSize={11} fontFamily="Outfit" fontWeight={500} letterSpacing="0.03em"
+          style={{ cursor: 'help' }}>
+          <title>{ax}: {AXIS_DESCRIPTIONS[ax]}</title>
           {ax}
         </text>
       ))}

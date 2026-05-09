@@ -29,7 +29,10 @@ function ScoreCard({ score, idx, animate }: { score: PlayerScore; idx: number; a
       <div style={{ flex: 1 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 6 }}>
           <span style={{ fontWeight: 600, fontSize: 14 }}>{score.name}</span>
-          <span style={{ display: 'inline-block', padding: '2px 8px', borderRadius: 99, fontSize: 11, fontWeight: 700, letterSpacing: '.05em', background: labelBg, border: `1px solid ${labelBorder}`, color: labelColor }}>{label}</span>
+          <span
+            title={sc >= 75 ? 'Score ≥ 75: this deck is significantly stronger than average for this pod' : sc >= 60 ? 'Score 60–74: this deck is well-matched with the pod' : 'Score < 60: this deck may struggle to keep up with the pod'}
+            style={{ display: 'inline-block', padding: '2px 8px', borderRadius: 99, fontSize: 11, fontWeight: 700, letterSpacing: '.05em', background: labelBg, border: `1px solid ${labelBorder}`, color: labelColor, cursor: 'help' }}
+          >{label}</span>
         </div>
         <ScoreBar score={sc} animate={animate} />
         {score.summary && <p style={{ marginTop: 7, fontSize: 12, color: 'var(--c-text3)', lineHeight: 1.5 }}>{score.summary}</p>}
@@ -56,7 +59,10 @@ export default function BalanceReport({ report, animate = false }: { report: Ana
   return (
     <div className="afu" style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
       {/* Verdict banner */}
-      <div style={{ padding: '16px 22px', borderRadius: 'var(--rad-lg)', background: verdictBg, border: `1px solid ${verdictBorder}`, display: 'flex', alignItems: 'center', gap: 12 }}>
+      <div
+        title={`Score spread: ${spread} points. ≤10 = balanced, 11–22 = slight edge, >22 = significant power gap`}
+        style={{ padding: '16px 22px', borderRadius: 'var(--rad-lg)', background: verdictBg, border: `1px solid ${verdictBorder}`, display: 'flex', alignItems: 'center', gap: 12, cursor: 'help' }}
+      >
         {spread > 22 ? <AlertTriangle size={20} style={{ flexShrink: 0 }} /> : <Scale size={20} style={{ flexShrink: 0 }} />}
         <span style={{ fontWeight: 500, fontSize: 15, color: 'var(--c-text)' }}>{verdict}</span>
       </div>

@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import type { Player } from '@/types/deck'
 import { ColorPips } from '@/components/ui/color-pips'
 import { ManaCurve } from '@/components/ui/mana-curve'
@@ -7,6 +7,7 @@ import { PLAYER_ACCENTS } from '@/lib/design'
 import type { DeckCard } from '@/types/card'
 import { useAppStore } from '@/store'
 import type { RoomPlayer } from '@/app/api/rooms/route'
+import PlayerSlot from '@/components/deck-loader/PlayerSlot'
 
 function groupCards(cards: DeckCard[]) {
   const typeOrder = ['Planeswalker', 'Creature', 'Instant', 'Sorcery', 'Enchantment', 'Artifact', 'Land', 'Other']
@@ -62,18 +63,17 @@ async function patchRoom(roomCode: string) {
 
 export default function PlayerZone({ player, idx }: { player: Player; idx: number }) {
   const acc = PLAYER_ACCENTS[idx]
-  const loadDeck = useAppStore(s => s.loadDeck)
   const roomCode = useAppStore(s => s.roomCode)
-  const [deckInput, setDeckInput] = useState('')
-  const [submitting, setSubmitting] = useState(false)
+  const [expanded, setExpanded] = useState(true)
+  const prevCardsLen = useRef(player.cards.length)
 
-  async function handleLoadDeck() {
-    if (!deckInput.trim()) return
-    setSubmitting(true)
-    await loadDeck(player.seat, deckInput)
-    if (roomCode) await patchRoom(roomCode)
-    setSubmitting(false)
-  }
+  // Sync room whenever this seat's deck transitions from empty to loaded
+  useEffect(() => {
+    if (prevCardsLen.current === 0 && player.cards.length > 0 && roomCode) {
+      patchRoom(roomCode)
+    }
+    prevCardsLen.current = player.cards.length
+  }, [player.cards.length, roomCode])
 
   const total = player.cards.reduce((s, dc) => s + dc.quantity, 0)
   const lands = player.cards.filter(dc => dc.card.type_line?.includes('Land')).reduce((s, dc) => s + dc.quantity, 0)
@@ -92,61 +92,15 @@ export default function PlayerZone({ player, idx }: { player: Player; idx: numbe
 
   const groups = groupCards(player.cards)
 
-  // Header is always shown
-  const header = (
-    <div style={{ padding: '16px 18px', borderBottom: '1px solid var(--c-sub)' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-        <div>
-          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '.22em', textTransform: 'uppercase', color: acc.c, marginBottom: 5 }}>Seat {player.seat}</div>
-          <div style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-.01em', lineHeight: 1 }}>{player.name}</div>
-        </div>
-        {player.cards.length > 0 && (
-          <div style={{ textAlign: 'right' }}>
-            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.15em', textTransform: 'uppercase', color: 'var(--c-text3)', marginBottom: 4 }}>Deck Size</div>
-            <div style={{ fontFamily: 'monospace', fontSize: 22, color: 'var(--c-text)' }}>{total}</div>
-          </div>
-        )}
-      </div>
-    </div>
-  )
-
-  // Empty / loading state
-  if (player.loading) {
+  // Empty / loading state — reuse the full PlayerSlot so all load modes are available
+  if (player.loading || player.cards.length === 0) {
     return (
-      <div className="mtg-card" style={{ display: 'flex', flexDirection: 'column', borderTop: `2px solid ${acc.c}88`, overflow: 'hidden' }}>
-        {header}
-        <div style={{ padding: '32px 18px', textAlign: 'center' }}>
-          <div style={{ fontSize: 12, color: 'var(--c-text3)', letterSpacing: '.1em', textTransform: 'uppercase' }}>Loading deck…</div>
-        </div>
-      </div>
-    )
-  }
-
-  if (player.cards.length === 0) {
-    return (
-      <div className="mtg-card" style={{ display: 'flex', flexDirection: 'column', borderTop: `2px solid ${acc.c}44`, overflow: 'hidden' }}>
-        {header}
-        <div style={{ padding: '18px' }}>
-          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.15em', textTransform: 'uppercase', color: 'var(--c-text3)', marginBottom: 10 }}>
-            Waiting for deck
-          </div>
-          <textarea
-            className="mtg-input"
-            placeholder={`Paste ${player.name}'s decklist here…`}
-            value={deckInput}
-            onChange={e => setDeckInput(e.target.value)}
-            style={{ width: '100%', minHeight: 130, resize: 'vertical', fontFamily: 'monospace', fontSize: 12, boxSizing: 'border-box' }}
-          />
-          <button
-            className="btn-gold"
-            onClick={handleLoadDeck}
-            disabled={!deckInput.trim() || submitting}
-            style={{ marginTop: 8, width: '100%' }}
-          >
-            {submitting ? 'Loading…' : 'Load Deck'}
-          </button>
-        </div>
-      </div>
+      <PlayerSlot
+        seat={player.seat}
+        idx={idx}
+        expanded={expanded}
+        onToggleExpand={() => setExpanded(v => !v)}
+      />
     )
   }
 
@@ -197,8 +151,13 @@ export default function PlayerZone({ player, idx }: { player: Player; idx: numbe
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 6, marginBottom: 12 }}>
-          {[['Lands', lands], ['Spells', spells], ['Avg CMC', avgCmc], ['Value', deckPrice > 0 ? `$${deckPrice.toFixed(0)}` : '—']].map(([l, v]) => (
-            <div key={String(l)} style={{ background: 'var(--c-bg)', border: '1px solid var(--c-sub)', borderRadius: 9, padding: '7px 8px', textAlign: 'center' }}>
+          {([
+            ['Lands', lands, 'Basic and non-basic lands in the deck'],
+            ['Spells', spells, 'Non-land cards including creatures, instants, sorceries, and more'],
+            ['Avg CMC', avgCmc, 'Average mana value of non-land cards'],
+            ['Value', deckPrice > 0 ? `$${deckPrice.toFixed(0)}` : '—', 'Estimated deck value in USD (Scryfall market prices)'],
+          ] as [string, string | number, string][]).map(([l, v, tip]) => (
+            <div key={String(l)} title={tip} style={{ background: 'var(--c-bg)', border: '1px solid var(--c-sub)', borderRadius: 9, padding: '7px 8px', textAlign: 'center', cursor: 'help' }}>
               <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.13em', textTransform: 'uppercase', color: 'var(--c-text3)', marginBottom: 3 }}>{l}</div>
               <div style={{ fontSize: 15, fontWeight: 600 }}>{v}</div>
             </div>
@@ -206,7 +165,7 @@ export default function PlayerZone({ player, idx }: { player: Player; idx: numbe
         </div>
 
         <div>
-          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.15em', textTransform: 'uppercase', color: 'var(--c-text3)', marginBottom: 6 }}>Mana Curve</div>
+          <div title="Distribution of mana costs across non-land cards. Hover each bar for the count." style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.15em', textTransform: 'uppercase', color: 'var(--c-text3)', marginBottom: 6, cursor: 'help', display: 'inline-block' }}>Mana Curve</div>
           <ManaCurve curve={curve} compact />
         </div>
       </div>

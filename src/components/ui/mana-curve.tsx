@@ -4,7 +4,11 @@ export function ManaCurve({ curve = [], compact = false }: { curve: number[]; co
   return (
     <div style={{ display: 'flex', alignItems: 'flex-end', gap: 3, height: barH + 14 }}>
       {curve.map((count, cmc) => (
-        <div key={cmc} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+        <div
+          key={cmc}
+          title={count > 0 ? `${count} card${count !== 1 ? 's' : ''} at CMC ${cmc === 7 ? '7+' : cmc}` : `No cards at CMC ${cmc}`}
+          style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2, cursor: count > 0 ? 'default' : undefined }}
+        >
           <div style={{
             width: '100%', minHeight: 3,
             height: count > 0 ? Math.max(3, Math.round((count / max) * barH)) : 3,

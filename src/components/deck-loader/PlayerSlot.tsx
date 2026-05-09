@@ -9,6 +9,7 @@ import { PLAYER_ACCENTS, DEMO_LISTS } from '@/lib/design'
 import { Check, X, ClipboardList, Link, Library, RotateCcw, Scissors } from 'lucide-react'
 import SaveToLibraryForm from '@/components/shared/SaveToLibraryForm'
 import DeckTrimmerModal from '@/components/modals/DeckTrimmerModal'
+import PlayerNameInput from '@/components/shared/PlayerNameInput'
 
 type LoadMode = 'paste' | 'moxfield' | 'library'
 
@@ -248,14 +249,20 @@ export default function PlayerSlot({ seat, idx, expanded, onToggleExpand }: Play
           <div style={{ width: 28, height: 28, borderRadius: '50%', background: acc.bg, border: `1.5px solid ${acc.c}55`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, color: acc.c, flexShrink: 0 }}>
             {idx + 1}
           </div>
-          <span style={{ fontWeight: 600, fontSize: 15 }}>{player?.name || `Player ${idx + 1}`}</span>
+          <PlayerNameInput
+            value={player?.name ?? ''}
+            placeholder={`Player ${idx + 1}`}
+            accentColor={acc.c}
+            onChange={v => updatePlayer(seat, { name: v })}
+            style={{ width: 160 }}
+          />
         </div>
         {isLoaded && (
           totalCards === 100
-            ? <span className="badge-green" style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><Check size={11} /> {totalCards} cards</span>
-            : <span className="badge-red" style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>{totalCards} cards · need 100</span>
+            ? <span className="badge-green" title="Commander format requires exactly 100 cards" style={{ display: 'inline-flex', alignItems: 'center', gap: 4, cursor: 'help' }}><Check size={11} /> {totalCards} cards</span>
+            : <span className="badge-red" title={`Commander format requires exactly 100 cards. You have ${totalCards} — ${totalCards > 100 ? `remove ${totalCards - 100}` : `add ${100 - totalCards} more`}.`} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, cursor: 'help' }}>{totalCards} cards · need 100</span>
         )}
-        {isLoading && <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--c-text3)' }}><div className="spinner" style={{ width: 14, height: 14 }} /> Resolving…</span>}
+        {isLoading && <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--c-text3)' }}><div className="spinner" style={{ width: 14, height: 14 }} /></span>}
       </div>
 
       {/* Loaded state */}
@@ -272,8 +279,13 @@ export default function PlayerSlot({ seat, idx, expanded, onToggleExpand }: Play
 
           {/* Stats */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 6 }}>
-            {[['Total', totalCards], ['Lands', landCount], ['Avg CMC', avgCmc], ['Value', deckPrice > 0 ? `$${deckPrice.toFixed(0)}` : '—']].map(([l, v]) => (
-              <div key={String(l)} style={{ background: 'var(--c-bg)', border: '1px solid var(--c-sub)', borderRadius: 8, padding: '6px 8px' }}>
+            {([
+              ['Total', totalCards, 'Total number of cards in the deck'],
+              ['Lands', landCount, 'Number of land cards'],
+              ['Avg CMC', avgCmc, 'Average mana value of non-land cards'],
+              ['Value', deckPrice > 0 ? `$${deckPrice.toFixed(0)}` : '—', 'Estimated deck value in USD'],
+            ] as [string, string | number, string][]).map(([l, v, tip]) => (
+              <div key={String(l)} title={tip} style={{ background: 'var(--c-bg)', border: '1px solid var(--c-sub)', borderRadius: 8, padding: '6px 8px', cursor: 'help' }}>
                 <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.13em', textTransform: 'uppercase', color: 'var(--c-text3)', marginBottom: 3 }}>{l}</div>
                 <div style={{ fontSize: 14, fontWeight: 600 }}>{v}</div>
               </div>
@@ -302,6 +314,7 @@ export default function PlayerSlot({ seat, idx, expanded, onToggleExpand }: Play
           {totalCards !== 100 && (
             <button
               className="btn-ghost"
+              title={totalCards > 100 ? `Deck has ${totalCards - 100} too many cards — use the trimmer to remove extras` : `Deck needs ${100 - totalCards} more cards — Commander format requires exactly 100`}
               style={{ fontSize: 12, padding: '7px 14px', borderColor: 'oklch(60% .22 20/.4)', color: 'oklch(68% .18 20)' }}
               onClick={() => setTrimmerOpen(true)}
             >
@@ -311,24 +324,32 @@ export default function PlayerSlot({ seat, idx, expanded, onToggleExpand }: Play
 
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 6 }}>
             <SaveToLibraryForm deckRaw={deckRaw} commander={player?.commander ?? ''} colors={player?.colors ?? []} moxfieldUrl={sourceMoxfield} />
-            <button className="btn-ghost" style={{ fontSize: 12, padding: '5px 10px' }} onClick={() => { clearPlayer(seat); setMoxfieldUrl(''); setSourceMoxfield(undefined) }}>
+            <button className="btn-ghost" title="Clear this deck and load a different one" style={{ fontSize: 12, padding: '5px 10px' }} onClick={() => { clearPlayer(seat); setMoxfieldUrl(''); setSourceMoxfield(undefined) }}>
               <X size={12} /> Change
             </button>
           </div>
         </div>
       ) : (
         <>
-          {/* Mode tabs */}
-          <div style={{ display: 'flex', borderBottom: '1px solid var(--c-sub)', marginBottom: 2 }}>
+          {/* Resolving state — hide form while deck is being fetched from Scryfall */}
+          {isLoading ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '18px 0', color: 'var(--c-text2)', fontSize: 13 }}>
+              <div className="spinner" style={{ width: 16, height: 16 }} />
+              Resolving cards…
+            </div>
+          ) : null}
+
+          {/* Mode tabs — hidden while resolving */}
+          {!isLoading && <div style={{ display: 'flex', borderBottom: '1px solid var(--c-sub)', marginBottom: 2 }}>
             {(['paste', 'moxfield', 'library'] as LoadMode[]).map(m => (
               <button key={m} type="button" style={TAB_STYLE(mode === m)} onClick={() => setMode(m)}>
                 {m === 'paste' ? <><ClipboardList size={12} /> Paste</> : m === 'moxfield' ? <><Link size={12} /> Import URL</> : <><Library size={12} /> Library</>}
               </button>
             ))}
-          </div>
+          </div>}
 
           {/* Paste mode */}
-          {mode === 'paste' && (
+          {!isLoading && mode === 'paste' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: '.18em', textTransform: 'uppercase', color: 'var(--c-text3)' }}>Color Identity</span>
@@ -367,7 +388,7 @@ export default function PlayerSlot({ seat, idx, expanded, onToggleExpand }: Play
               )}
 
               <div style={{ display: 'flex', gap: 8 }}>
-                <button className="btn-ghost" style={{ fontSize: 12, padding: '7px 14px' }} onClick={handleLoadDemo} disabled={isLoading}>
+                <button className="btn-ghost" title="Load a sample Commander deck to try the app" style={{ fontSize: 12, padding: '7px 14px' }} onClick={handleLoadDemo} disabled={isLoading}>
                   Load Demo
                 </button>
                 <button className="btn-primary" style={{ flex: 1, fontSize: 13 }} onClick={handleLoad} disabled={!deckRaw.trim() || isLoading}>
@@ -378,7 +399,7 @@ export default function PlayerSlot({ seat, idx, expanded, onToggleExpand }: Play
           )}
 
           {/* Moxfield mode */}
-          {mode === 'moxfield' && (
+          {!isLoading && mode === 'moxfield' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               <div style={{ fontSize: 12, color: 'var(--c-text3)', lineHeight: 1.6 }}>
                 Paste a public deck URL — Moxfield, Archidekt, or TappedOut.<br />Commander and colors are auto-detected.
@@ -408,7 +429,7 @@ export default function PlayerSlot({ seat, idx, expanded, onToggleExpand }: Play
           )}
 
           {/* Library mode */}
-          {mode === 'library' && (
+          {!isLoading && mode === 'library' && (
             <LibraryPicker onSelect={handleLibrarySelect} />
           )}
         </>
