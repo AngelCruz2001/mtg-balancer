@@ -24,6 +24,18 @@ async function fetchCollection(names: string[]): Promise<CollectionResponse> {
   return res.json() as Promise<CollectionResponse>
 }
 
+// Fuzzy fallback for names the collection endpoint can't match exactly
+// (e.g. adventure cards listed by front-face name only: "Ishgard, the Holy See")
+async function fetchFuzzy(name: string): Promise<ScryfallCard | null> {
+  try {
+    const res = await fetch(`${BASE}/cards/named?fuzzy=${encodeURIComponent(name)}`)
+    if (!res.ok) return null
+    return res.json() as Promise<ScryfallCard>
+  } catch {
+    return null
+  }
+}
+
 // lines: ["4 Lightning Bolt", "1 Sol Ring", ...]
 export async function fetchDeck(lines: string[]): Promise<FetchDeckResult> {
   const parsed = lines
@@ -48,6 +60,16 @@ export async function fetchDeck(lines: string[]): Promise<FetchDeckResult> {
     for (const nf of result.not_found) {
       notFoundNames.add(nf.name.toLowerCase())
     }
+  }
+
+  // Fuzzy-retry names the collection endpoint missed (adventure/DFC front-face names, near-typos)
+  if (notFoundNames.size > 0) {
+    await Promise.all(
+      [...notFoundNames].map(async name => {
+        const card = await fetchFuzzy(name)
+        if (card) cardMap.set(name, card)
+      }),
+    )
   }
 
   const cards: DeckCard[] = []
