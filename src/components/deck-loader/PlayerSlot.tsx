@@ -332,8 +332,8 @@ export default function PlayerSlot({ seat, idx, expanded, onToggleExpand }: Play
                 {player!.parseErrors.length} card{player!.parseErrors.length > 1 ? 's' : ''} not found — fix &amp; retry
               </div>
               <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 6 }}>
-                {player!.parseErrors.map((e, i) => (
-                  <CardErrorRow key={i} seat={seat} errorLine={e.line} />
+                {player!.parseErrors.map(e => (
+                  <CardErrorRow key={e.line} seat={seat} errorLine={e.line} />
                 ))}
               </ul>
             </div>
@@ -385,12 +385,12 @@ export default function PlayerSlot({ seat, idx, expanded, onToggleExpand }: Play
 
               {(player?.parseErrors?.length ?? 0) > 0 && (
                 <div style={{ padding: '8px 12px', borderRadius: 8, background: 'oklch(22% .08 82/.15)', border: '1px solid oklch(73% .17 82/.2)', fontSize: 11, color: 'var(--c-gold)' }}>
-                  <div style={{ fontWeight: 600, marginBottom: 4 }}>
-                    {player!.parseErrors.length} card{player!.parseErrors.length > 1 ? 's' : ''} not found
+                  <div style={{ fontWeight: 600, marginBottom: 8 }}>
+                    {player!.parseErrors.length} card{player!.parseErrors.length > 1 ? 's' : ''} not found — fix &amp; retry
                   </div>
-                  <ul style={{ margin: 0, padding: '0 0 0 14px', display: 'flex', flexDirection: 'column', gap: 2 }}>
-                    {player!.parseErrors.map((e, i) => (
-                      <li key={i} style={{ color: 'oklch(68% .13 82)', fontFamily: 'monospace', fontSize: 11 }}>{e.line}</li>
+                  <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    {player!.parseErrors.map(e => (
+                      <CardErrorRow key={e.line} seat={seat} errorLine={e.line} />
                     ))}
                   </ul>
                 </div>
